@@ -1,0 +1,22 @@
+{
+  "name": "atrocore/import-feeds-http",
+  "default": "",
+  "require": {
+    "atrocore/core": "~1.4.34",
+    "atrocore/import-feeds": "~1.3.26"
+  },
+  "autoload": {
+    "psr-4": {
+      "ImportHttp\\": "app/"
+    }
+  },
+  "extra": {
+    "treoId": "ImportHttp",
+    "name": {
+      "default": "Import Feeds: HTTP Request"
+    },
+    "description": {
+      "default": "The module enables to import data via HTTP request."
+    }
+  }
+}
