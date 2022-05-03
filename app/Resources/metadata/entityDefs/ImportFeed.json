@@ -9,7 +9,8 @@
     "httpUrl": {
       "type": "varchar",
       "notStorable": true,
-      "dataField": true
+      "dataField": true,
+      "view": "import-http:views/import-feed/fields/http-url"
     },
     "adapter": {
       "type": "enum",

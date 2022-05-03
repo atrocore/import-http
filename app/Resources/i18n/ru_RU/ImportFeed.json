@@ -4,6 +4,7 @@
     "httpUrl": "URL"
   },
   "labels": {
-    "http": "HTTP Запрос"
+    "http": "HTTP Запрос",
+    "execute": "Выполнить"
   }
 }
