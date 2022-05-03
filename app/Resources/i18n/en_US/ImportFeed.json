@@ -1,6 +1,7 @@
 {
   "fields": {
-    "adapter": "Adapter"
+    "adapter": "Adapter",
+    "httpUrl": "URL"
   },
   "labels": {
     "http": "HTTP Request"

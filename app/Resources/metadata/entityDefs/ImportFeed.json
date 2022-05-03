@@ -6,6 +6,11 @@
         "http"
       ]
     },
+    "httpUrl": {
+      "type": "varchar",
+      "notStorable": true,
+      "dataField": true
+    },
     "adapter": {
       "type": "enum",
       "options": [],

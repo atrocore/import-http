@@ -1,6 +1,30 @@
 {
   "dynamicLogic": {
     "fields": {
+      "httpUrl": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        },
+        "required": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      },
       "adapter": {
         "visible": {
           "conditionGroup": [
