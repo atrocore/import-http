@@ -5,6 +5,12 @@
         "__APPEND__",
         "http"
       ]
+    },
+    "adapter": {
+      "type": "enum",
+      "options": [],
+      "notStorable": true,
+      "dataField": true
     }
   }
 }

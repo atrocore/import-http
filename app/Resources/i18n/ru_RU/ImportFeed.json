@@ -1,4 +1,7 @@
 {
+  "fields": {
+    "adapter": "Adapter"
+  },
   "labels": {
     "http": "HTTP Запрос"
   }
