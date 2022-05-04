@@ -23,16 +23,67 @@ declare(strict_types=1);
 namespace ImportHttp\Services;
 
 use Espo\Core\Services\Base;
+use Espo\Core\Utils\Metadata;
+use ImportHttp\ImportAdapter\ImportAdapterInterface;
 
 class ImportHttp extends Base
 {
-    public function getAllColumns(string $httpUrl, string $adapter): array
+    public function getAllColumns(string $httpUrl, string $adapterName): array
     {
-        return [];
+        $httpUrl = trim($httpUrl);
+
+        if (empty($httpUrl)) {
+            return [];
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $httpUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Content-Type: application/json',
+        ]);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        if (!empty($adapter = $this->getAdapter($adapterName))) {
+            $adapter->prepareRequest($ch);
+        }
+
+        $result = @json_decode(curl_exec($ch), true);
+        if (!empty($adapter) && !empty($result)) {
+            $result = $adapter->prepareResponse($result);
+        }
+
+        curl_close($ch);
+
+        return array_keys($result);
+    }
+
+    public function getAdapter(string $adapterName): ?ImportAdapterInterface
+    {
+        if (!empty($adapterName)) {
+            $className = $this->getMetadata()->get(['app', 'importAdapters', $adapterName]);
+            if (!empty($className) && is_a($className, ImportAdapterInterface::class, true)) {
+                return new $className();
+            }
+        }
+
+        return null;
     }
 
     protected function init()
     {
         parent::init();
+
+        $this->addDependency('metadata');
     }
+
+    protected function getMetadata(): Metadata
+    {
+        return $this->getInjection('metadata');
+
+    }
+
 }

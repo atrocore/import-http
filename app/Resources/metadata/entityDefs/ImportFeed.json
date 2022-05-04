@@ -14,9 +14,12 @@
     },
     "adapter": {
       "type": "enum",
-      "options": [],
+      "options": [
+        ""
+      ],
       "notStorable": true,
-      "dataField": true
+      "dataField": true,
+      "prohibitedEmptyValue": false
     }
   }
 }
