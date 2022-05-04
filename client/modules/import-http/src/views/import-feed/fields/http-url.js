@@ -46,6 +46,10 @@ Espo.define('import-http:views/import-feed/fields/http-url', 'views/fields/varch
         },
 
         actionExecuteHttpRequest(silent) {
+            if (this.model.get('type') !== 'http') {
+                return;
+            }
+
             if (!silent) {
                 this.notify('Loading...');
             }
