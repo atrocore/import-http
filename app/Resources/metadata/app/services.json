@@ -1,3 +1,4 @@
 {
-  "ImportHttp": "\\ImportHttp\\Services\\ImportHttp"
+  "ImportHttp": "\\ImportHttp\\Services\\ImportHttp",
+  "ImportTypeHttp": "\\ImportHttp\\Services\\ImportTypeHttp"
 }
