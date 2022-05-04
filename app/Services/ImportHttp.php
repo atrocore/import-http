@@ -58,7 +58,7 @@ class ImportHttp extends Base
 
         curl_close($ch);
 
-        return array_keys($result);
+        return isset($result[0]) ? array_keys($result[0]) : [];
     }
 
     public function getAdapter(string $adapterName): ?ImportAdapterInterface
