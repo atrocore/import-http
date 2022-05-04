@@ -22,17 +22,15 @@ Espo.define('import-http:views/import-feed/fields/http-url', 'views/fields/varch
 
         events: {
             'click .action[data-action="executeHttpRequest"]': function () {
-                this.actionExecuteHttpRequest();
+                this.actionExecuteHttpRequest(false);
             }
         },
 
         setup() {
             Dep.prototype.setup.call(this);
 
-            this.listenTo(this.model, 'change:httpUrl change:adapter', () => {
-                this.ajaxGetRequest(`ImportHttp/action/getAllColumns?httpUrl=${this.model.get('httpUrl')}&adapter=${this.model.get('adapter')}`).success(allColumns => {
-                    this.model.set('allColumns', allColumns);
-                });
+            this.listenTo(this.model, 'after:save', () => {
+                this.actionExecuteHttpRequest(true);
             });
         },
 
@@ -47,12 +45,23 @@ Espo.define('import-http:views/import-feed/fields/http-url', 'views/fields/varch
             this.$el.append(button)
         },
 
-        actionExecuteHttpRequest() {
-            this.notify('Loading...');
-            this.ajaxGetRequest(`ImportHttp/action/getAllColumns?httpUrl=${this.model.get('httpUrl')}&adapter=${this.model.get('adapter')}`).success(allColumns => {
+        actionExecuteHttpRequest(silent) {
+            if (!silent) {
+                this.notify('Loading...');
+            }
+
+            const data = {
+                httpUrl: this.model.get('httpUrl') || '',
+                adapter: this.model.get('adapter') || '',
+                importFeedId: this.model.get('id') || ''
+            };
+
+            this.ajaxGetRequest(`ImportHttp/action/getAllColumns`, data).success(allColumns => {
                 this.model.set('allColumns', allColumns);
-                this.notify('Success', 'success');
                 $('.action[data-action=refresh][data-panel=configuratorItems]').click();
+                if (!silent) {
+                    this.notify('Success', 'success');
+                }
             });
         },
 

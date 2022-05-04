@@ -28,7 +28,7 @@ use ImportHttp\ImportAdapter\ImportAdapterInterface;
 
 class ImportHttp extends Base
 {
-    public function getAllColumns(string $httpUrl, string $adapterName): array
+    public function getAllColumns(string $httpUrl, string $adapterName, string $importFeedId): array
     {
         $httpUrl = trim($httpUrl);
 
@@ -58,7 +58,20 @@ class ImportHttp extends Base
 
         curl_close($ch);
 
-        return isset($result[0]) ? array_keys($result[0]) : [];
+        $allColumns = isset($result[0]) ? array_keys($result[0]) : [];
+
+        if (!empty($importFeedId)) {
+            $importFeed = $this->getEntityManager()->getEntity('ImportFeed', $importFeedId);
+            if (!empty($importFeed)) {
+                if ($allColumns !== $importFeed->getFeedField('allColumns')) {
+                    $importFeed->setFeedField('allColumns', $allColumns);
+                    $this->getEntityManager()->saveEntity($importFeed);
+                    $this->getInjection('serviceFactory')->create('ImportFeed')->removeItemsByAllColumns($importFeed, $allColumns);
+                }
+            }
+        }
+
+        return $allColumns;
     }
 
     public function getAdapter(string $adapterName): ?ImportAdapterInterface
@@ -78,6 +91,7 @@ class ImportHttp extends Base
         parent::init();
 
         $this->addDependency('metadata');
+        $this->addDependency('serviceFactory');
     }
 
     protected function getMetadata(): Metadata
