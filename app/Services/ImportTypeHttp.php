@@ -28,6 +28,8 @@ use ImportHttp\ImportAdapter\ImportAdapterInterface;
 
 class ImportTypeHttp extends ImportTypeSimple
 {
+    private int $iterations = 0;
+
     public function prepareJobData(ImportFeed $feed, string $attachmentId): array
     {
         return [
@@ -89,6 +91,12 @@ class ImportTypeHttp extends ImportTypeSimple
 
     protected function getInputData(array $data): array
     {
+        if ($this->iterations > 0) {
+            return [];
+        }
+
+        $this->iterations++;
+
         return $this->httpRequest($data['httpUrl'], $data['adapter']);
     }
 }
