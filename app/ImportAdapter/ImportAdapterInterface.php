@@ -24,7 +24,7 @@ namespace ImportHttp\ImportAdapter;
 
 interface ImportAdapterInterface
 {
-    public function prepareRequest($ch): void;
+    public function prepareRequest($ch, string $httpUrl, int $offset, int $limit): void;
 
     public function prepareResponse(array $result): array;
 }

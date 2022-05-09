@@ -53,7 +53,7 @@ class ImportTypeHttp extends ImportTypeSimple
         return null;
     }
 
-    public function httpRequest(string $httpUrl, string $adapterName): array
+    public function httpRequest(string $httpUrl, string $adapterName, int $offset = 0, int $limit = \PHP_INT_MAX): array
     {
         $httpUrl = trim($httpUrl);
 
@@ -75,7 +75,7 @@ class ImportTypeHttp extends ImportTypeSimple
         $adapter = $this->getAdapter($adapterName);
 
         if (!empty($adapter)) {
-            $adapter->prepareRequest($ch);
+            $adapter->prepareRequest($ch, $httpUrl, $offset, $limit);
         }
 
         $result = @json_decode(curl_exec($ch), true);
