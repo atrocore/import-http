@@ -37,8 +37,6 @@ class ImportHttp extends \Espo\Core\Controllers\Base
             throw new Forbidden();
         }
 
-        return $this
-            ->getService('ImportHttp')
-            ->getAllColumns((string)$request->get('httpUrl'), (string)$request->get('adapter'), (string)$request->get('importFeedId'));
+        return $this->getService('ImportTypeHttp')->getAllColumns((string)$request->get('httpUrl'), (string)$request->get('adapter'), (string)$request->get('importFeedId'));
     }
 }

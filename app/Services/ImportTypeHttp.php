@@ -47,7 +47,7 @@ class ImportTypeHttp extends ImportTypeSimple
         if (!empty($adapterName)) {
             $className = $this->getMetadata()->get(['app', 'importAdapters', $adapterName]);
             if (!empty($className) && is_a($className, ImportAdapterInterface::class, true)) {
-                return new $className();
+                return new $className($this->getContainer());
             }
         }
 
@@ -87,6 +87,31 @@ class ImportTypeHttp extends ImportTypeSimple
         curl_close($ch);
 
         return empty($result) ? [] : $result;
+    }
+
+    public function getAllColumns(string $httpUrl, string $adapterName, string $importFeedId): array
+    {
+        $adapter = $this->getAdapter($adapterName);
+
+        if (!empty($adapter) && method_exists($adapter, 'getAllColumns')) {
+            $allColumns = $adapter->getAllColumns();
+        } else {
+            $result = $this->httpRequest($httpUrl, $adapterName, 0, 1);
+            $allColumns = isset($result[0]) ? array_keys($result[0]) : [];
+        }
+
+        if (!empty($importFeedId)) {
+            $importFeed = $this->getEntityManager()->getEntity('ImportFeed', $importFeedId);
+            if (!empty($importFeed)) {
+                if ($allColumns !== $importFeed->getFeedField('allColumns')) {
+                    $importFeed->setFeedField('allColumns', $allColumns);
+                    $this->getEntityManager()->saveEntity($importFeed);
+                    $this->getInjection('serviceFactory')->create('ImportFeed')->removeItemsByAllColumns($importFeed, $allColumns);
+                }
+            }
+        }
+
+        return $allColumns;
     }
 
     protected function getInputData(array $data): array
