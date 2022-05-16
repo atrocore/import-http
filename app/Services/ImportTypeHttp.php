@@ -28,7 +28,8 @@ use ImportHttp\ImportAdapter\ImportAdapterInterface;
 
 class ImportTypeHttp extends ImportTypeSimple
 {
-    private int $iterations = 0;
+    private int $offset = 0;
+    private int $limit = 200;
 
     public function prepareJobData(ImportFeed $feed, string $attachmentId): array
     {
@@ -78,10 +79,9 @@ class ImportTypeHttp extends ImportTypeSimple
             $adapter->prepareRequest($ch, $httpUrl, $offset, $limit);
         }
 
-        $result = @json_decode(curl_exec($ch), true);
-
+        $result = curl_exec($ch);
         if (!empty($adapter) && !empty($result)) {
-            $result = $adapter->prepareResponse($result);
+            $result = $adapter->prepareResponse(@json_decode($result, true));
         }
 
         curl_close($ch);
@@ -91,12 +91,9 @@ class ImportTypeHttp extends ImportTypeSimple
 
     protected function getInputData(array $data): array
     {
-        if ($this->iterations > 0) {
-            return [];
-        }
+        $result = $this->httpRequest($data['httpUrl'], $data['adapter'], $this->offset, $this->limit);
+        $this->offset = $this->offset + $this->limit;
 
-        $this->iterations++;
-
-        return $this->httpRequest($data['httpUrl'], $data['adapter']);
+        return $result;
     }
 }

@@ -28,7 +28,7 @@ class ImportHttp extends Base
 {
     public function getAllColumns(string $httpUrl, string $adapterName, string $importFeedId): array
     {
-        $result = $this->getInjection('serviceFactory')->create('ImportTypeHttp')->httpRequest($httpUrl, $adapterName, 0, 1);
+        $result = $this->getInjection('serviceFactory')->create('ImportTypeHttp')->httpRequest($httpUrl, $adapterName, 0, 20);
 
         $allColumns = isset($result[0]) ? array_keys($result[0]) : [];
 
