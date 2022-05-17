@@ -121,4 +121,11 @@ class ImportTypeHttp extends ImportTypeSimple
 
         return $result;
     }
+
+    protected function init()
+    {
+        parent::init();
+
+        $this->addDependency('serviceFactory');
+    }
 }
