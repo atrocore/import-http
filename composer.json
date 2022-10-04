@@ -16,7 +16,7 @@
       "default": "Import Feeds: HTTP Request"
     },
     "description": {
-      "default": "The module enables to import data via HTTP request."
+      "default": "This module allows you to import any structured data manually or automatically via HTTP request. Any REST/SOAP API calls can be executed. Use this module for seamless system integration."
     }
   }
 }
