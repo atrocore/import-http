@@ -20,6 +20,20 @@
       "notStorable": true,
       "dataField": true,
       "prohibitedEmptyValue": false
+    },
+    "importHttpHeaders": {
+      "type": "linkMultiple",
+      "layoutDetailDisabled": true,
+      "layoutMassUpdateDisabled": true,
+      "noLoad": true,
+      "importDisabled": true
+    }
+  },
+  "links": {
+    "importHttpHeaders": {
+      "type": "hasMany",
+      "foreign": "importFeed",
+      "entity": "ImportHttpHeader"
     }
   }
 }

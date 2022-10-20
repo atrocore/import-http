@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "name": "Schlüssel",
+    "value": "Wert",
+    "importFeed": "Import Feed"
+  },
+  "links": {
+    "importFeed": "Import Feed"
+  }
+}

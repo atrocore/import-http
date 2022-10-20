@@ -23,8 +23,8 @@ declare(strict_types=1);
 namespace ImportHttp\Listeners;
 
 use Espo\Core\Utils\Json;
-use Treo\Core\EventManager\Event;
-use Treo\Listeners\AbstractListener;
+use Espo\Core\EventManager\Event;
+use Espo\Listeners\AbstractListener;
 
 class LayoutController extends AbstractListener
 {
@@ -47,6 +47,15 @@ class LayoutController extends AbstractListener
 
         $result[1]['rows'][] = [['name' => 'adapter'], false];
         $result[1]['rows'][] = [['name' => 'httpUrl'], false];
+
+        $event->setArgument('result', Json::encode($result));
+    }
+
+    protected function modifyImportFeedRelationships(Event $event): void
+    {
+        $result = Json::decode($event->getArgument('result'), true);
+
+        $result = array_merge([['name' => 'importHttpHeaders']], $result);
 
         $event->setArgument('result', Json::encode($result));
     }

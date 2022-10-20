@@ -1,7 +1,11 @@
 {
   "fields": {
     "adapter": "Adapter",
-    "httpUrl": "URL"
+    "httpUrl": "URL",
+    "importHttpHeaders": "Headers"
+  },
+  "links": {
+    "importHttpHeaders": "Headers"
   },
   "labels": {
     "http": "HTTP Anfrage",

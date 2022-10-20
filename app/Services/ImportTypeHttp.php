@@ -56,6 +56,7 @@ class ImportTypeHttp extends ImportTypeSimple
 
     public function httpRequest(string $httpUrl, string $adapterName, int $offset = 0, int $limit = \PHP_INT_MAX): array
     {
+        return[];
         $httpUrl = trim($httpUrl);
 
         if (empty($httpUrl)) {
