@@ -22,111 +22,108 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
+use Espo\Core\Exceptions\BadRequest;
+use Espo\Core\FilePathBuilder;
+use Espo\Core\Utils\Util;
 use Import\Entities\ImportFeed;
 use Import\Services\ImportTypeSimple;
-use ImportHttp\ImportAdapter\ImportAdapterInterface;
 
 class ImportTypeHttp extends ImportTypeSimple
 {
-    private int $offset = 0;
-    private int $limit = 200;
-
     public function prepareJobData(ImportFeed $feed, string $attachmentId): array
     {
-        return [
-            "name"    => $feed->get('name'),
-            "httpUrl" => $feed->getFeedField('httpUrl'),
-            "adapter" => $feed->getFeedField('adapter'),
-            "action"  => $feed->get('fileDataAction'),
-            "data"    => $feed->getConfiguratorData()
-        ];
-    }
+        $result = parent::prepareJobData($feed, $attachmentId);
 
-    public function getAdapter(string $adapterName): ?ImportAdapterInterface
-    {
-        if (!empty($adapterName)) {
-            $className = $this->getMetadata()->get(['app', 'importAdapters', $adapterName]);
-            if (!empty($className) && is_a($className, ImportAdapterInterface::class, true)) {
-                return new $className($this->getContainer());
-            }
-        }
-
-        return null;
-    }
-
-    public function httpRequest(string $httpUrl, string $adapterName, int $offset = 0, int $limit = \PHP_INT_MAX): array
-    {
-        return[];
-        $httpUrl = trim($httpUrl);
-
-        if (empty($httpUrl)) {
-            return [];
-        }
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $httpUrl);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Accept: application/json',
-            'Content-Type: application/json',
-        ]);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-        $adapter = $this->getAdapter($adapterName);
-
-        if (!empty($adapter)) {
-            $adapter->prepareRequest($ch, $httpUrl, $offset, $limit);
-        }
-
-        $result = curl_exec($ch);
-        if (!empty($adapter) && !empty($result)) {
-            $result = $adapter->prepareResponse(@json_decode($result, true));
-        }
-
-        curl_close($ch);
-
-        return empty($result) ? [] : $result;
-    }
-
-    public function getAllColumns(string $httpUrl, string $adapterName, string $importFeedId): array
-    {
-        $adapter = $this->getAdapter($adapterName);
-
-        if (!empty($adapter) && method_exists($adapter, 'getAllColumns')) {
-            $allColumns = $adapter->getAllColumns();
-        } else {
-            $result = $this->httpRequest($httpUrl, $adapterName, 0, 1);
-            $allColumns = isset($result[0]) ? array_keys($result[0]) : [];
-        }
-
-        if (!empty($importFeedId)) {
-            $importFeed = $this->getEntityManager()->getEntity('ImportFeed', $importFeedId);
-            if (!empty($importFeed)) {
-                if ($allColumns !== $importFeed->getFeedField('allColumns')) {
-                    $importFeed->setFeedField('allColumns', $allColumns);
-                    $this->getEntityManager()->saveEntity($importFeed);
-                    $this->getInjection('serviceFactory')->create('ImportFeed')->removeItemsByAllColumns($importFeed, $allColumns);
-                }
-            }
-        }
-
-        return $allColumns;
-    }
-
-    protected function getInputData(array $data): array
-    {
-        $result = $this->httpRequest($data['httpUrl'], $data['adapter'], $this->offset, $this->limit);
-        $this->offset = $this->offset + $this->limit;
+        $result['httpUrl'] = $feed->getFeedField('httpUrl');
+        $result['httpMethod'] = $feed->getFeedField('httpMethod');
+        $result['httpBody'] = $feed->getFeedField('httpBody');
+        $result['httpHeaders'] = $feed->get('importHttpHeaders')->toArray();
 
         return $result;
     }
 
-    protected function init()
+    public function run(array $data = []): bool
     {
-        parent::init();
+        $data['attachmentId'] = $this->createAttachment($data);
 
-        $this->addDependency('serviceFactory');
+        return parent::run($data);
+    }
+
+    public function createAttachment(array $data): string
+    {
+        if (empty($data['httpUrl']) || empty($data['fileFormat'])) {
+            throw new BadRequest('Validation failed.');
+        }
+
+        $attachmentName = Util::generateId();
+
+        $headers = [];
+        switch ($data['fileFormat']) {
+            case 'JSON':
+                $headers[] = 'Content-Type: application/json';
+                $attachmentName .= '.json';
+                break;
+            case 'XML':
+                $headers[] = 'Content-Type: application/xml';
+                $attachmentName .= '.xml';
+                break;
+            case 'CSV':
+                $attachmentName .= '.csv';
+                break;
+            case 'Excel':
+                $attachmentName .= '.xlsx';
+                break;
+        }
+
+        if (!empty($data['httpHeaders'])) {
+            foreach ($data['httpHeaders'] as $v) {
+                $headers[] = "{$v['name']}: {$v['value']}";
+            }
+        }
+
+        $ch = curl_init(trim($data['httpUrl']));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, empty($data['httpMethod']) ? 'GET' : $data['httpMethod']);
+        if (!empty($data['httpBody'])) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data['httpBody']);
+        }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $output = curl_exec($ch);
+        if ($output === false) {
+            throw new BadRequest('Curl error: ' . curl_error($ch));
+        }
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if (!in_array($httpCode, [200, 201, 204])) {
+            throw new BadRequest("Response Code: $httpCode Body: $output");
+        }
+
+        $repository = $this->getEntityManager()->getRepository('Attachment');
+
+        $attachment = $repository->get();
+        $attachment->set('name', $attachmentName);
+        $attachment->set('storageFilePath', $repository->getDestPath(FilePathBuilder::UPLOAD));
+        $attachment->set('storageThumbPath', $repository->getDestPath(FilePathBuilder::UPLOAD));
+        $attachment->set('relatedType', 'Asset');
+        $attachment->set('field', 'file');
+
+        $fullPath = $this->getConfig()->get('filesPath', 'upload/files/') . $attachment->get('storageFilePath');
+        if (!file_exists($fullPath)) {
+            mkdir($fullPath, 0777, true);
+        }
+
+        $fileName = $fullPath . '/' . $attachmentName;
+
+        file_put_contents($fileName, $output);
+
+        $attachment->set('md5', md5_file($fileName));
+        $attachment->set('size', filesize($fileName));
+        $attachment->set('type', mime_content_type($fileName));
+
+        $repository->save($attachment, ['skipAll' => true]);
+
+        return $attachment->get('id');
     }
 }
