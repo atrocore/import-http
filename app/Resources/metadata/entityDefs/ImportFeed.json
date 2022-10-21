@@ -23,8 +23,13 @@
     "httpUrl": {
       "type": "varchar",
       "notStorable": true,
+      "dataField": true
+    },
+    "httpBody": {
+      "type": "text",
+      "notStorable": true,
       "dataField": true,
-      "view": "import-http:views/import-feed/fields/http-url"
+      "useDisabledTextareaInViewMode": true
     },
     "importHttpHeaders": {
       "type": "linkMultiple",

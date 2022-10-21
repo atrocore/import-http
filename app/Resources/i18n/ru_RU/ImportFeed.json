@@ -2,6 +2,7 @@
   "fields": {
     "httpUrl": "URL",
     "httpMethod": "Метод",
+    "httpBody": "Тело запроса",
     "importHttpHeaders": "Заголовки"
   },
   "links": {
