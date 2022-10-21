@@ -1,0 +1,8 @@
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Import Feed Header"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Import Feed Headers"
+  }
+}

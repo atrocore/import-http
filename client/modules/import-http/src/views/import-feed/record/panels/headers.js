@@ -1,4 +1,3 @@
-<?php
 /*
  * This file is part of premium software, which is NOT free.
  * Copyright (c) AtroCore UG (haftungsbeschränkt).
@@ -18,12 +17,16 @@
  * for your own needs, if source code is provided.
  */
 
-declare(strict_types=1);
+Espo.define('import-http:views/import-feed/record/panels/headers', 'views/record/panels/relationship',
+    Dep => Dep.extend({
 
-namespace ImportHttp\Controllers;
+        afterRender() {
+            Dep.prototype.afterRender.call(this);
 
-use Espo\Core\Templates\Controllers\Base;
+            if (!['http'].includes(this.model.get('type'))) {
+                this.$el.parent().hide();
+            }
+        },
 
-class ImportHttpHeader extends Base
-{
-}
+    })
+);
