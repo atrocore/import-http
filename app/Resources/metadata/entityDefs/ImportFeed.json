@@ -6,6 +6,20 @@
         "http"
       ]
     },
+    "httpMethod": {
+      "type": "enum",
+      "options": [
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "GET"
+      ],
+      "default": "GET",
+      "notStorable": true,
+      "dataField": true,
+      "prohibitedEmptyValue": true
+    },
     "httpUrl": {
       "type": "varchar",
       "notStorable": true,

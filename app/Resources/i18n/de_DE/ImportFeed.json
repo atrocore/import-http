@@ -2,6 +2,7 @@
   "fields": {
     "adapter": "Adapter",
     "httpUrl": "URL",
+    "httpMethod": "Methode",
     "importHttpHeaders": "Headers"
   },
   "links": {
