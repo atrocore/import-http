@@ -1,6 +1,5 @@
 {
   "fields": {
-    "adapter": "Adapter",
     "httpUrl": "URL",
     "httpMethod": "Метод",
     "importHttpHeaders": "Заголовки"

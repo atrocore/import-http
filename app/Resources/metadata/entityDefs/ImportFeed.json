@@ -26,15 +26,6 @@
       "dataField": true,
       "view": "import-http:views/import-feed/fields/http-url"
     },
-    "adapter": {
-      "type": "enum",
-      "options": [
-        ""
-      ],
-      "notStorable": true,
-      "dataField": true,
-      "prohibitedEmptyValue": false
-    },
     "importHttpHeaders": {
       "type": "linkMultiple",
       "layoutDetailDisabled": true,

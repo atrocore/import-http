@@ -45,7 +45,6 @@ class LayoutController extends AbstractListener
     {
         $result = Json::decode($event->getArgument('result'), true);
 
-        $result[1]['rows'][] = [['name' => 'adapter'], false];
         $result[1]['rows'][] = [['name' => 'httpMethod'], ['name' => 'httpUrl']];
 
         $event->setArgument('result', Json::encode($result));
