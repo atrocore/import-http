@@ -1,0 +1,18 @@
+{
+  "entity": true,
+  "layouts": false,
+  "tab": false,
+  "acl": true,
+  "aclPortal": false,
+  "customizable": false,
+  "importable": true,
+  "notifications": false,
+  "stream": false,
+  "disabled": false,
+  "type": "Base",
+  "module": "ImportHttp",
+  "object": true,
+  "hasAssignedUser": false,
+  "hasTeam": false,
+  "hasOwner": false
+}

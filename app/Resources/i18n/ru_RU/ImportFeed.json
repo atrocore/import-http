@@ -1,7 +1,12 @@
 {
   "fields": {
-    "adapter": "Adapter",
-    "httpUrl": "URL"
+    "httpUrl": "URL",
+    "httpMethod": "Метод",
+    "httpBody": "Тело запроса",
+    "importHttpHeaders": "Заголовки"
+  },
+  "links": {
+    "importHttpHeaders": "Заголовки"
   },
   "labels": {
     "http": "HTTP Запрос",

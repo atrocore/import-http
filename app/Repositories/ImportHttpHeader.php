@@ -20,8 +20,10 @@
 
 declare(strict_types=1);
 
-namespace ImportHttp\Services;
+namespace ImportHttp\Repositories;
 
-class ImportTypeHttp extends \Import\Services\ImportTypeSimple
+use Espo\Core\Templates\Repositories\Base;
+
+class ImportHttpHeader extends Base
 {
 }

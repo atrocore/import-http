@@ -6,20 +6,44 @@
         "http"
       ]
     },
+    "httpMethod": {
+      "type": "enum",
+      "options": [
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "GET"
+      ],
+      "default": "GET",
+      "notStorable": true,
+      "dataField": true,
+      "prohibitedEmptyValue": true
+    },
     "httpUrl": {
       "type": "varchar",
       "notStorable": true,
-      "dataField": true,
-      "view": "import-http:views/import-feed/fields/http-url"
+      "dataField": true
     },
-    "adapter": {
-      "type": "enum",
-      "options": [
-        ""
-      ],
+    "httpBody": {
+      "type": "text",
       "notStorable": true,
       "dataField": true,
-      "prohibitedEmptyValue": false
+      "useDisabledTextareaInViewMode": true
+    },
+    "importHttpHeaders": {
+      "type": "linkMultiple",
+      "layoutDetailDisabled": true,
+      "layoutMassUpdateDisabled": true,
+      "noLoad": true,
+      "importDisabled": true
+    }
+  },
+  "links": {
+    "importHttpHeaders": {
+      "type": "hasMany",
+      "foreign": "importFeed",
+      "entity": "ImportHttpHeader"
     }
   }
 }

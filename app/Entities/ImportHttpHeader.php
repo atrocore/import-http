@@ -20,8 +20,9 @@
 
 declare(strict_types=1);
 
-namespace ImportHttp\Services;
+namespace ImportHttp\Entities;
 
-class ImportTypeHttp extends \Import\Services\ImportTypeSimple
+class ImportHttpHeader extends \Espo\Core\Templates\Entities\Base
 {
+    protected $entityType = "ImportHttpHeader";
 }
