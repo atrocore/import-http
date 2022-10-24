@@ -5,7 +5,7 @@
       "required": true
     },
     "value": {
-      "type": "varchar",
+      "type": "text",
       "required": false
     },
     "createdAt": {

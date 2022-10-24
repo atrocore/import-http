@@ -1,5 +1,8 @@
 {
   "fields": {
+    "httpOffset": "Request Offset",
+    "httpLimit": "Request Limit",
+    "httpTotal": "Total Request Records",
     "httpUrl": "URL",
     "httpMethod": "Method",
     "httpBody": "Request Body",

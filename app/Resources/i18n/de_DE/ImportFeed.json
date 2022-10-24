@@ -1,8 +1,5 @@
 {
   "fields": {
-    "httpUrl": "URL",
-    "httpMethod": "Methode",
-    "httpBody": "Request Body",
     "importHttpHeaders": "Headers"
   },
   "links": {

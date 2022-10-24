@@ -31,6 +31,24 @@
       "dataField": true,
       "useDisabledTextareaInViewMode": true
     },
+    "httpOffset": {
+      "type": "int",
+      "notStorable": true,
+      "dataField": true,
+      "default": 0
+    },
+    "httpLimit": {
+      "type": "int",
+      "notStorable": true,
+      "dataField": true,
+      "default": 100
+    },
+    "httpTotal": {
+      "type": "int",
+      "notStorable": true,
+      "dataField": true,
+      "default": 2000
+    },
     "importHttpHeaders": {
       "type": "linkMultiple",
       "layoutDetailDisabled": true,
