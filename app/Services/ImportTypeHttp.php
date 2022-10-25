@@ -30,8 +30,29 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 {
     public function runImport(ImportFeed $importFeed, string $attachmentId): string
     {
-        $importFeedService = $this->getService('ImportFeed');
+        // https://webservicefiles-bergner.com/api/articles?pagination={"page":1,"pageLength":200}
+        // https://webservicefiles-bergner.com/api/articles?pagination={"page":2,"pageLength":200}
 
+        // https://webservicefiles-bergner.com/api/articles?pagination={"page":4,"pageLength":200}
+
+        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":0,"limit":200}
+        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":200,"limit":200}
+
+        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":3,"limit":200}
+        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":203,"limit":200}
+        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":403,"limit":200}
+
+        // offset = 3           // offset = 999  page = 5
+        // limit = 200          // limit = 200
+        // total = 600          // total = 600
+
+
+        /** @var ImportTypeHttpJobCreator $jobCreator */
+        $jobCreator = $this->getService('ImportTypeHttpJobCreator');
+
+        $queueManager = $this->getContainer()->get('queueManager');
+
+        $offset = (int)$importFeed->getFeedField('httpOffset');
         $limit = (int)$importFeed->getFeedField('httpLimit');
         $total = (int)$importFeed->getFeedField('httpTotal');
         $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
@@ -50,123 +71,57 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             $httpUrl = str_replace('{{total}}', (string)$total, $httpUrl);
         }
 
+        if (strpos($httpUrl, '{{offset}}') !== false) {
+            if (empty($limit) || empty($total)) {
+                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+            }
+
+            while ($offset < $total) {
+                $jobData = [
+                    'importFeedId' => $importFeed->get('id'),
+                    'httpUrl'      => str_replace('{{offset}}', (string)$offset, $httpUrl)
+                ];
+                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
+
+                $offset = $offset + $limit;
+            }
+
+            return '-';
+        }
+
         if (strpos($httpUrl, '{{page}}') !== false) {
             if (empty($limit) || empty($total)) {
                 throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
-            $pages = ceil($total / $limit);
 
-            if ($pages > 0) {
+            $pages = ceil(($total - $offset) / $limit);
+
+            if ($pages < 1) {
+                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+            }
+
+            $page = $offset > 0 ? ceil($offset / $limit) : 1;
+
+            if ($pages == 1) {
+                $jobCreator->run(['importFeedId' => $importFeed->get('id'), 'httpUrl' => str_replace('{{page}}', (string)$page, $httpUrl)]);
+                return $jobCreator->importJobId;
+            } else {
                 $i = 1;
                 while ($i <= $pages) {
-                    $attachmentId = $this->createAttachment($importFeed, str_replace('{{page}}', (string)$i, $httpUrl));
-
-                    $data = $this->prepareJobData($importFeed, $attachmentId, true);
-                    $data['data']['importJobId'] = $importFeedService->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachmentId)->get('id');
-
-                    $importFeedService->push($importFeedService->getName($importFeed), 'ImportTypeHttp', $data);
-
+                    $jobData = [
+                        'importFeedId' => $importFeed->get('id'),
+                        'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl)
+                    ];
+                    $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
                     $i++;
+                    $page++;
                 }
-
-                return $data['data']['importJobId'];
+                return '-';
             }
         }
 
-        $attachmentId = $this->createAttachment($importFeed, $httpUrl);
+        $jobCreator->run(['importFeedId' => $importFeed->get('id'), 'httpUrl' => $httpUrl]);
 
-        $data = $this->prepareJobData($importFeed, $attachmentId, true);
-        $data['data']['importJobId'] = $importFeedService->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachmentId)->get('id');
-
-        $importFeedService->push($importFeedService->getName($importFeed), 'ImportTypeHttp', $data);
-
-        return $data['data']['importJobId'];
-    }
-
-    protected function createAttachment(ImportFeed $importFeed, string $httpUrl): string
-    {
-        if (empty($httpUrl)) {
-            throw new BadRequest('Validation failed. URL is required.');
-        }
-
-        $httpMethod = $importFeed->getFeedField('httpMethod');
-        $httpBody = $importFeed->getFeedField('httpBody');
-        $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
-        $fileFormat = $importFeed->getFeedField('format');
-
-        if (empty($fileFormat)) {
-            throw new BadRequest('Validation failed. Format is required.');
-        }
-
-        $attachmentName = (new \DateTime())->format('Y-m-d_H:i:s');
-
-        $headers = [];
-        switch ($fileFormat) {
-            case 'JSON':
-                $headers[] = 'Content-Type: application/json';
-                $attachmentName .= '.json';
-                break;
-            case 'XML':
-                $headers[] = 'Content-Type: application/xml';
-                $attachmentName .= '.xml';
-                break;
-            case 'CSV':
-                $attachmentName .= '.csv';
-                break;
-            case 'Excel':
-                $attachmentName .= '.xlsx';
-                break;
-        }
-
-        if (!empty($httpHeaders)) {
-            foreach ($httpHeaders as $v) {
-                $headers[] = "{$v['name']}: {$v['value']}";
-            }
-        }
-
-        $ch = curl_init($httpUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, empty($httpMethod) ? 'GET' : $httpMethod);
-        if (!empty($httpBody)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $httpBody);
-        }
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $output = curl_exec($ch);
-        if ($output === false) {
-            throw new BadRequest('Curl error: ' . curl_error($ch));
-        }
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if (!in_array($httpCode, [200, 201, 204])) {
-            throw new BadRequest("Response Code: $httpCode Body: $output");
-        }
-
-        $repository = $this->getEntityManager()->getRepository('Attachment');
-
-        $attachment = $repository->get();
-        $attachment->set('name', $attachmentName);
-        $attachment->set('storageFilePath', $repository->getDestPath(FilePathBuilder::UPLOAD));
-        $attachment->set('storageThumbPath', $repository->getDestPath(FilePathBuilder::UPLOAD));
-        $attachment->set('relatedType', 'Asset');
-        $attachment->set('field', 'file');
-
-        $fullPath = $this->getConfig()->get('filesPath', 'upload/files/') . $attachment->get('storageFilePath');
-        if (!file_exists($fullPath)) {
-            mkdir($fullPath, 0777, true);
-        }
-
-        $fileName = $fullPath . '/' . $attachmentName;
-
-        file_put_contents($fileName, $output);
-
-        $attachment->set('md5', md5_file($fileName));
-        $attachment->set('size', filesize($fileName));
-        $attachment->set('type', mime_content_type($fileName));
-
-        $repository->save($attachment, ['skipAll' => true]);
-
-        return $attachment->get('id');
+        return $jobCreator->importJobId;
     }
 }

@@ -1,5 +1,6 @@
 {
   "fields": {
+    "httpOffset": "Request Offset",
     "httpLimit": "Request Limit",
     "httpTotal": "Total Request Records",
     "httpUrl": "URL",
@@ -15,6 +16,6 @@
     "execute": "Execute"
   },
   "exceptions": {
-    "urlCannotBeFormed": "URL cannot be formed, please check your parameters for Limit and Total records."
+    "urlCannotBeFormed": "URL cannot be formed, please check your parameters for Offset, Limit and Total records."
   }
 }

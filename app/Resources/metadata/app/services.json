@@ -1,3 +1,4 @@
 {
-  "ImportTypeHttp": "\\ImportHttp\\Services\\ImportTypeHttp"
+  "ImportTypeHttp": "\\ImportHttp\\Services\\ImportTypeHttp",
+  "ImportTypeHttpJobCreator": "\\ImportHttp\\Services\\ImportTypeHttpJobCreator"
 }
