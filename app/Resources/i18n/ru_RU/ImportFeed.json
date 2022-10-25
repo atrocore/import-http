@@ -8,5 +8,8 @@
   "labels": {
     "http": "HTTP Запрос",
     "execute": "Выполнить"
+  },
+  "exceptions": {
+    "urlCannotBeFormed": "URL нельзя сформировать, пожалуйста проверьте параметры Limit и Total records."
   }
 }
