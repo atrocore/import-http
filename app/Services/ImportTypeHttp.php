@@ -23,30 +23,12 @@ declare(strict_types=1);
 namespace ImportHttp\Services;
 
 use Espo\Core\Exceptions\BadRequest;
-use Espo\Core\FilePathBuilder;
 use Import\Entities\ImportFeed;
 
 class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 {
     public function runImport(ImportFeed $importFeed, string $attachmentId): string
     {
-        // https://webservicefiles-bergner.com/api/articles?pagination={"page":1,"pageLength":200}
-        // https://webservicefiles-bergner.com/api/articles?pagination={"page":2,"pageLength":200}
-
-        // https://webservicefiles-bergner.com/api/articles?pagination={"page":4,"pageLength":200}
-
-        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":0,"limit":200}
-        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":200,"limit":200}
-
-        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":3,"limit":200}
-        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":203,"limit":200}
-        // https://webservicefiles-bergner.com/api/articles?pagination={"offset":403,"limit":200}
-
-        // offset = 3           // offset = 999  page = 5
-        // limit = 200          // limit = 200
-        // total = 600          // total = 600
-
-
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
 
