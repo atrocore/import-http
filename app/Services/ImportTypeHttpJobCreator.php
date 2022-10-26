@@ -40,7 +40,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $importFeed = $importFeedService->getEntity($data['importFeedId']);
 
-        $attachmentId = $this->createAttachment($importFeed, $data['httpUrl']);
+        $attachmentId = $this->createAttachment($importFeed, $data['httpUrl'], (string)$data['httpBody']);
 
         $data = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachmentId, true);
         $data['data']['importJobId'] = $importFeedService->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachmentId)->get('id');
@@ -57,14 +57,13 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
-    public function createAttachment(ImportFeed $importFeed, string $httpUrl): string
+    public function createAttachment(ImportFeed $importFeed, string $httpUrl, string $httpBody): string
     {
         if (empty($httpUrl)) {
             throw new BadRequest('Validation failed. URL is required.');
         }
 
         $httpMethod = $importFeed->getFeedField('httpMethod');
-        $httpBody = $importFeed->getFeedField('httpBody');
         $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
         $fileFormat = $importFeed->getFeedField('format');
 

@@ -10,6 +10,6 @@
     "execute": "Выполнить"
   },
   "exceptions": {
-    "urlCannotBeFormed": "URL нельзя сформировать, пожалуйста проверьте параметры Offset, Limit и Total records."
+    "urlOrBodyCannotBeFormed": "URL или Request Body нельзя сформировать, пожалуйста проверьте параметры Offset, Limit и Total records."
   }
 }

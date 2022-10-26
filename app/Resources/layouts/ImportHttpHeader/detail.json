@@ -5,17 +5,15 @@
     "rows": [
       [
         {
-          "name": "name"
-        },
-        {
-          "name": "value"
+          "name": "name",
+          "fullWidth": true
         }
       ],
       [
         {
-          "name": "importFeed"
-        },
-        false
+          "name": "value",
+          "fullWidth": true
+        }
       ]
     ]
   }

@@ -38,30 +38,34 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         $limit = (int)$importFeed->getFeedField('httpLimit');
         $total = (int)$importFeed->getFeedField('httpTotal');
         $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
+        $httpBody = (string)$importFeed->getFeedField('httpBody');
 
-        if (strpos($httpUrl, '{{limit}}') !== false) {
+        if (strpos($httpUrl, '{{limit}}') !== false || strpos($httpBody, '{{limit}}') !== false) {
             if (empty($limit)) {
-                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
             $httpUrl = str_replace('{{limit}}', (string)$limit, $httpUrl);
+            $httpBody = str_replace('{{limit}}', (string)$limit, $httpBody);
         }
 
-        if (strpos($httpUrl, '{{total}}') !== false) {
+        if (strpos($httpUrl, '{{total}}') !== false || strpos($httpBody, '{{total}}') !== false) {
             if (empty($total)) {
-                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
             $httpUrl = str_replace('{{total}}', (string)$total, $httpUrl);
+            $httpBody = str_replace('{{total}}', (string)$total, $httpBody);
         }
 
-        if (strpos($httpUrl, '{{offset}}') !== false) {
+        if (strpos($httpUrl, '{{offset}}') !== false || strpos($httpBody, '{{offset}}') !== false) {
             if (empty($limit) || empty($total)) {
-                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
 
             while ($offset < $total) {
                 $jobData = [
                     'importFeedId' => $importFeed->get('id'),
-                    'httpUrl'      => str_replace('{{offset}}', (string)$offset, $httpUrl)
+                    'httpUrl'      => str_replace('{{offset}}', (string)$offset, $httpUrl),
+                    'httpBody'     => str_replace('{{offset}}', (string)$offset, $httpBody)
                 ];
                 $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
 
@@ -71,9 +75,9 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             return '-';
         }
 
-        if (strpos($httpUrl, '{{page}}') !== false) {
+        if (strpos($httpUrl, '{{page}}') !== false || strpos($httpBody, '{{page}}') !== false) {
             if (empty($limit) || empty($total)) {
-                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
 
             $pages = ceil(($total - $offset) / $limit);
@@ -92,7 +96,8 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 while ($i <= $pages) {
                     $jobData = [
                         'importFeedId' => $importFeed->get('id'),
-                        'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl)
+                        'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl),
+                        'httpBody'     => str_replace('{{page}}', (string)$page, $httpBody)
                     ];
                     $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
                     $i++;

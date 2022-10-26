@@ -16,6 +16,6 @@
     "execute": "Execute"
   },
   "exceptions": {
-    "urlCannotBeFormed": "URL cannot be formed, please check your parameters for Offset, Limit and Total records."
+    "urlOrBodyCannotBeFormed": "URL or Request Body cannot be formed, please check your parameters for Offset, Limit and Total records."
   }
 }

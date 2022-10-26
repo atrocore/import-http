@@ -10,6 +10,6 @@
     "execute": "Ausführen"
   },
   "exceptions": {
-    "urlCannotBeFormed": "URL kann nicht gebildet werden, bitte überprüfen Sie Ihre Parameter für Offset, Limit und Total Records."
+    "urlOrBodyCannotBeFormed": "URL oder Request Body kann nicht gebildet werden, bitte überprüfen Sie Ihre Parameter für Offset, Limit und Total Records."
   }
 }

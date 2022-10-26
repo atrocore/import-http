@@ -5,10 +5,14 @@
     "rows": [
       [
         {
-          "name": "name"
-        },
+          "name": "name",
+          "fullWidth": true
+        }
+      ],
+      [
         {
-          "name": "value"
+          "name": "value",
+          "fullWidth": true
         }
       ]
     ]
