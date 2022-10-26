@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
+use Espo\Core\EventManager\Event;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\FilePathBuilder;
 use Espo\ORM\Entity;
@@ -73,7 +74,12 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $attachmentName = (new \DateTime())->format('Y-m-d_H:i:s');
 
-        $headers = [];
+        $headers = $this
+            ->getContainer()
+            ->get('eventManager')
+            ->dispatch('ImportTypeHttpJobCreatorService', 'prepareAttachmentHeaders', new Event(['importFeed' => $importFeed, 'headers' => []]))
+            ->getArgument('headers');
+
         switch ($fileFormat) {
             case 'JSON':
                 $headers[] = 'Content-Type: application/json';

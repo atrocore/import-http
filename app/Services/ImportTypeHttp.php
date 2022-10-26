@@ -79,7 +79,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             $pages = ceil(($total - $offset) / $limit);
 
             if ($pages < 1) {
-                throw new BadRequest($this->translate('urlCannotBeFormed', 'exceptions', 'ImportFeed'));
+                $pages = 1;
             }
 
             $page = $offset > 0 ? ceil($offset / $limit) : 1;
