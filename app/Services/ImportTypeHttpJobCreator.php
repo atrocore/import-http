@@ -31,23 +31,27 @@ use Import\Entities\ImportFeed;
 
 class ImportTypeHttpJobCreator extends QueueManagerBase
 {
-    public $importJobId = null;
-
     public function run(array $data = []): bool
     {
         /** @var \Import\Services\ImportFeed $importFeedService */
         $importFeedService = $this->getContainer()->get('serviceFactory')->create('ImportFeed');
 
-        $importFeed = $importFeedService->getEntity($data['importFeedId']);
 
-        $attachmentId = $this->createAttachment($importFeed, $data['httpUrl'], (string)$data['httpBody']);
+        foreach ($data as $item) {
+            $importFeed = $importFeedService->getEntity($item['importFeedId']);
 
-        $data = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachmentId, true);
-        $data['data']['importJobId'] = $importFeedService->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachmentId)->get('id');
+            $attachmentId = $this->createAttachment($importFeed, $item['httpUrl'], (string)$item['httpBody']);
 
-        $importFeedService->push($importFeedService->getName($importFeed), 'ImportTypeHttp', $data);
+            $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachmentId, true);
+            $jobData['data']['importJobId'] = $importFeedService->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachmentId)->get('id');
 
-        $this->importJobId = $data['data']['importJobId'];
+            $importFeedService->push($importFeedService->getName($importFeed), 'ImportTypeHttp', $jobData);
+
+            $this
+                ->getContainer()
+                ->get('eventManager')
+                ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
+        }
 
         return true;
     }

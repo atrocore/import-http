@@ -27,7 +27,7 @@ use Import\Entities\ImportFeed;
 
 class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 {
-    public function runImport(ImportFeed $importFeed, string $attachmentId): string
+    public function runImport(ImportFeed $importFeed, string $attachmentId): bool
     {
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
@@ -61,18 +61,19 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
 
+            $jobData = [];
             while ($offset < $total) {
-                $jobData = [
+                $jobData[] = [
                     'importFeedId' => $importFeed->get('id'),
                     'httpUrl'      => str_replace('{{offset}}', (string)$offset, $httpUrl),
                     'httpBody'     => str_replace('{{offset}}', (string)$offset, $httpBody)
                 ];
-                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
-
                 $offset = $offset + $limit;
             }
 
-            return '-';
+            $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
+
+            return true;
         }
 
         if (strpos($httpUrl, '{{page}}') !== false || strpos($httpBody, '{{page}}') !== false) {
@@ -89,26 +90,42 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             $page = $offset > 0 ? ceil($offset / $limit) : 1;
 
             if ($pages == 1) {
-                $jobCreator->run(['importFeedId' => $importFeed->get('id'), 'httpUrl' => str_replace('{{page}}', (string)$page, $httpUrl)]);
-                return $jobCreator->importJobId;
+                $jobCreator->run([
+                    [
+                        'importFeedId' => $importFeed->get('id'),
+                        'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl),
+                        'httpBody'     => str_replace('{{page}}', (string)$page, $httpBody)
+                    ]
+                ]);
+
+                return true;
             } else {
+                $jobData = [];
                 $i = 1;
                 while ($i <= $pages) {
-                    $jobData = [
+                    $jobData[] = [
                         'importFeedId' => $importFeed->get('id'),
                         'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl),
                         'httpBody'     => str_replace('{{page}}', (string)$page, $httpBody)
                     ];
-                    $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
+
                     $i++;
                     $page++;
                 }
-                return '-';
+                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
+
+                return true;
             }
         }
 
-        $jobCreator->run(['importFeedId' => $importFeed->get('id'), 'httpUrl' => $httpUrl]);
+        $jobCreator->run([
+            [
+                'importFeedId' => $importFeed->get('id'),
+                'httpUrl'      => $httpUrl,
+                'httpBody'     => $httpBody
+            ]
+        ]);
 
-        return $jobCreator->importJobId;
+        return true;
     }
 }
