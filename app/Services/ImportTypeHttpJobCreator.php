@@ -36,7 +36,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         /** @var \Import\Services\ImportFeed $importFeedService */
         $importFeedService = $this->getContainer()->get('serviceFactory')->create('ImportFeed');
 
-
         foreach ($data as $item) {
             $importFeed = $importFeedService->getEntity($item['importFeedId']);
 
