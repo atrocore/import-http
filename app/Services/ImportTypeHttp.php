@@ -27,7 +27,7 @@ use Import\Entities\ImportFeed;
 
 class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 {
-    public function runImport(ImportFeed $importFeed, string $attachmentId): bool
+    public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool
     {
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
@@ -65,6 +65,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             while ($offset < $total) {
                 $jobData[] = [
                     'importFeedId' => $importFeed->get('id'),
+                    'payload'      => $payload,
                     'httpUrl'      => str_replace('{{offset}}', (string)$offset, $httpUrl),
                     'httpBody'     => str_replace('{{offset}}', (string)$offset, $httpBody)
                 ];
@@ -93,6 +94,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 $jobCreator->run([
                     [
                         'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
                         'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl),
                         'httpBody'     => str_replace('{{page}}', (string)$page, $httpBody)
                     ]
@@ -105,6 +107,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 while ($i <= $pages) {
                     $jobData[] = [
                         'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
                         'httpUrl'      => str_replace('{{page}}', (string)$page, $httpUrl),
                         'httpBody'     => str_replace('{{page}}', (string)$page, $httpBody)
                     ];
@@ -121,6 +124,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         $jobCreator->run([
             [
                 'importFeedId' => $importFeed->get('id'),
+                'payload'      => $payload,
                 'httpUrl'      => $httpUrl,
                 'httpBody'     => $httpBody
             ]
