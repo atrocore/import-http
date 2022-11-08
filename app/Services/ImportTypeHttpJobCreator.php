@@ -39,7 +39,12 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         foreach ($data as $item) {
             $importFeed = $importFeedService->getEntity($item['importFeedId']);
 
-            $attachmentId = $this->createAttachment($importFeed, $item['httpUrl'], (string)$item['httpBody']);
+            try {
+                $attachmentId = $this->createAttachment($importFeed, $item['httpUrl'], (string)$item['httpBody']);
+            } catch (\Throwable $e) {
+                $attachmentId = '';
+                $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
+            }
 
             $payload = empty($item['payload']) ? null : json_decode(json_encode($item['payload']));
 
