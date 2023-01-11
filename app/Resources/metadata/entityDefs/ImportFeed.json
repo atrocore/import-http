@@ -1,6 +1,10 @@
 {
   "fields": {
     "type": {
+      "optionsIds": [
+        "__APPEND__",
+        "http"
+      ],
       "options": [
         "__APPEND__",
         "http"
@@ -8,6 +12,13 @@
     },
     "httpMethod": {
       "type": "enum",
+      "optionsIds": [
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "GET"
+      ],
       "options": [
         "POST",
         "PUT",
