@@ -68,8 +68,7 @@
     },
     "httpConnectionName": {
       "type": "varchar",
-      "notStorable": true,
-      "dataField": true
+      "notStorable": true
     },
     "importHttpHeaders": {
       "type": "linkMultiple",
