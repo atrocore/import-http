@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
+use Espo\ConnectionType\ConnectionOauth2;
 use Espo\Core\EventManager\Event;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\FilePathBuilder;
@@ -104,6 +105,14 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             case 'Excel':
                 $attachmentName .= '.xlsx';
                 break;
+        }
+
+        if (!empty($importFeed->getFeedField('httpConnectionId'))) {
+            $connectionEntity = $this->getEntityManager()->getEntity('Connection', $importFeed->getFeedField('httpConnectionId'));
+            if (!empty($connectionEntity)) {
+                $connectionData = $this->getContainer()->get(ConnectionOauth2::class)->connect($connectionEntity);
+                $headers[] = "Authorization: {$connectionData['token_type']} {$connectionData['access_token']}";
+            }
         }
 
         if (!empty($httpHeaders)) {
