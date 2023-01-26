@@ -66,6 +66,11 @@
       "notStorable": true,
       "dataField": true
     },
+    "httpConnectionName": {
+      "type": "varchar",
+      "notStorable": true,
+      "dataField": true
+    },
     "importHttpHeaders": {
       "type": "linkMultiple",
       "layoutDetailDisabled": true,
