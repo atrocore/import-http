@@ -1,6 +1,6 @@
 {
   "connectionTypes": {
-    "httpPro": [
+    "http": [
       "oauth2"
     ]
   }
