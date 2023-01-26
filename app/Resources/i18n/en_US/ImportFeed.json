@@ -5,6 +5,7 @@
     "httpTotal": "Total Request Records",
     "httpUrl": "URL",
     "httpMethod": "Method",
+    "httpConnectionId": "Connection",
     "httpBody": "Request Body",
     "importHttpHeaders": "Headers"
   },

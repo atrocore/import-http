@@ -60,6 +60,12 @@
       "dataField": true,
       "default": 2000
     },
+    "httpConnectionId": {
+      "type": "varchar",
+      "view": "import-http:views/import-feed/fields/http-connection",
+      "notStorable": true,
+      "dataField": true
+    },
     "importHttpHeaders": {
       "type": "linkMultiple",
       "layoutDetailDisabled": true,
