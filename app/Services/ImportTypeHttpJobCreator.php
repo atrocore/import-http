@@ -34,6 +34,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 {
     public function run(array $data = []): bool
     {
+        $GLOBALS['skipAssignmentNotifications'] = true;
+        $GLOBALS['skipHooks'] = true;
+
         /** @var \Import\Services\ImportFeed $importFeedService */
         $importFeedService = $this->getContainer()->get('serviceFactory')->create('ImportFeed');
 
