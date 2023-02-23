@@ -23,10 +23,16 @@ declare(strict_types=1);
 namespace ImportHttp\Services;
 
 use Espo\Core\Exceptions\BadRequest;
+use Espo\ORM\Entity;
 use Import\Entities\ImportFeed;
 
 class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 {
+    public function getNotificationMessage(Entity $queueItem): string
+    {
+        return '';
+    }
+
     public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool
     {
         /** @var ImportTypeHttpJobCreator $jobCreator */
