@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace ImportHttp\Services;
 
 use Espo\Core\Exceptions\BadRequest;
+use Espo\Core\QueueManager;
 use Espo\ORM\Entity;
 use Import\Entities\ImportFeed;
 
@@ -39,6 +40,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
 
+        /** @var QueueManager $queueManager */
         $queueManager = $this->getContainer()->get('queueManager');
 
         $offset = (int)$importFeed->getFeedField('httpOffset');
@@ -79,7 +81,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 $offset = $offset + $limit;
             }
 
-            $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
+            $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
 
             return true;
         }
