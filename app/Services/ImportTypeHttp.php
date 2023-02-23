@@ -30,6 +30,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 {
     public function getNotificationMessage(Entity $queueItem): string
     {
+        // disable notifications, because for big count of jobs it looks like spam
         return '';
     }
 
