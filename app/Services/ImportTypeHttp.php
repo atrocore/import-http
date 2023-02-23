@@ -124,7 +124,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                     $i++;
                     $page++;
                 }
-                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData);
+                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
 
                 return true;
             }
