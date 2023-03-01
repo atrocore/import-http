@@ -32,35 +32,20 @@ use Import\Entities\ImportFeed;
 
 class ImportTypeHttpJobCreator extends QueueManagerBase
 {
+    protected $importFeedService = null;
+
     public function run(array $data = []): bool
     {
         $GLOBALS['skipAssignmentNotifications'] = true;
         $GLOBALS['skipHooks'] = true;
 
-        /** @var \Import\Services\ImportFeed $importFeedService */
-        $importFeedService = $this->getContainer()->get('serviceFactory')->create('ImportFeed');
-
         foreach ($data as $item) {
-            $importFeed = $importFeedService->getEntity($item['importFeedId']);
-
+            $payload = empty($item['payload']) ? [] : json_decode(json_encode($item['payload']));
             try {
-                $attachmentId = $this->createAttachment($importFeed, $item['httpUrl'], (string)$item['httpBody']);
+                $this->createJobs($item['importFeedId'], $item['httpUrl'], (string)$item['httpBody'], $payload);
             } catch (\Throwable $e) {
-                $attachmentId = '';
                 $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
             }
-
-            $payload = empty($item['payload']) ? null : json_decode(json_encode($item['payload']));
-
-            $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachmentId, true);
-            $jobData['data']['importJobId'] = $importFeedService->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachmentId, $payload)->get('id');
-
-            $importFeedService->push($importFeedService->getName($importFeed), 'ImportTypeHttp', $jobData);
-
-            $this
-                ->getContainer()
-                ->get('eventManager')
-                ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
         }
 
         return true;
@@ -71,11 +56,13 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
-    public function createAttachment(ImportFeed $importFeed, string $httpUrl, string $httpBody): string
+    public function createJobs(string $importFeedId, string $httpUrl, string $httpBody, array $payload = []): void
     {
         if (empty($httpUrl)) {
             throw new BadRequest('Validation failed. URL is required.');
         }
+
+        $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
 
         $httpMethod = $importFeed->getFeedField('httpMethod');
         $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
@@ -124,6 +111,14 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             }
         }
 
+        $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
+        $attachment = $this->createAttachment($attachmentName, $output);
+
+        $this->createJob($importFeed, $attachment, $payload);
+    }
+
+    protected function sendRequest(string $httpUrl, string $httpMethod, array $headers, string $httpBody = null): string
+    {
         $ch = curl_init($httpUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLINFO_HEADER_OUT, true);
@@ -143,23 +138,46 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             throw new BadRequest("Response Code: $httpCode Body: $output");
         }
 
+        return $output;
+    }
+
+    protected function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
+    {
+        $payload = empty($payload) ? null : $payload;
+
+        $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
+        $jobData['data']['importJobId'] = $this
+            ->getImportFeedService()
+            ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload)->get('id');
+
+        $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp', $jobData);
+
+        $this
+            ->getContainer()
+            ->get('eventManager')
+            ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
+    }
+
+    protected function createAttachment(string $name, string $contents): Entity
+    {
         $repository = $this->getEntityManager()->getRepository('Attachment');
 
         $attachment = $repository->get();
-        $attachment->set('name', $attachmentName);
+        $attachment->set('name', $name);
         $attachment->set('storageFilePath', $repository->getDestPath(FilePathBuilder::UPLOAD));
         $attachment->set('storageThumbPath', $repository->getDestPath(FilePathBuilder::UPLOAD));
         $attachment->set('relatedType', 'Asset');
         $attachment->set('field', 'file');
 
         $fullPath = $this->getConfig()->get('filesPath', 'upload/files/') . $attachment->get('storageFilePath');
-        if (!file_exists($fullPath)) {
+        while (!file_exists($fullPath)) {
             mkdir($fullPath, 0777, true);
+            usleep(100);
         }
 
-        $fileName = $fullPath . '/' . $attachmentName;
+        $fileName = $fullPath . '/' . $name;
 
-        file_put_contents($fileName, $output);
+        file_put_contents($fileName, $contents);
 
         $attachment->set('md5', md5_file($fileName));
         $attachment->set('size', filesize($fileName));
@@ -167,6 +185,15 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $repository->save($attachment, ['skipAll' => true]);
 
-        return $attachment->get('id');
+        return $attachment;
+    }
+
+    protected function getImportFeedService(): \Import\Services\ImportFeed
+    {
+        if (empty($this->importFeedService)) {
+            $this->importFeedService = $this->getContainer()->get('serviceFactory')->create('ImportFeed');
+        }
+
+        return $this->importFeedService;
     }
 }
