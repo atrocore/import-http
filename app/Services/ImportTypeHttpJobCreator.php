@@ -141,7 +141,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $output;
     }
 
-    protected function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
+    public function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
     {
         $payload = empty($payload) ? null : $payload;
 
