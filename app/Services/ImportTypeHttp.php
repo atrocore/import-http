@@ -40,6 +40,16 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
 
+        if(!empty($attachmentId)){
+            $attachment = $this
+                ->getEntityManager()
+                ->getEntity('Attachment', $attachmentId);
+            if(!empty($attachment)){
+                $jobCreator->createJob($importFeed, $attachment, []);
+            }
+            return true;
+        }
+
         /** @var QueueManager $queueManager */
         $queueManager = $this->getContainer()->get('queueManager');
 
