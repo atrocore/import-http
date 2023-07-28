@@ -40,7 +40,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $GLOBALS['skipHooks'] = true;
 
         foreach ($data as $item) {
-            $payload = empty($item['payload']) ? [] : json_decode(json_encode($item['payload']));
+            // prepare payload
+            $payload = empty($item['payload']) ? [] : json_decode(json_encode($item['payload']), true);
+
             try {
                 $this->createJobs($item['importFeedId'], $item['httpUrl'], (string)$item['httpBody'], $payload);
             } catch (\Throwable $e) {
@@ -143,7 +145,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
     public function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
     {
-        $payload = empty($payload) ? null : $payload;
+        // prepare payload
+        $payload = empty($payload) ? null : json_decode(json_encode($payload));
 
         $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
         $jobData['data']['importJobId'] = $this
