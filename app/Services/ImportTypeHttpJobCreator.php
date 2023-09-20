@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
-use Espo\ConnectionType\ConnectionOauth2;
+use Atro\ConnectionType\ConnectionOauth2;
 use Espo\Core\EventManager\Event;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\FilePathBuilder;
