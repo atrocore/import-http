@@ -138,7 +138,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                         'importFeedId' => $importFeed->get('id'),
                         'payload'      => $payload,
                         'httpUrl'      => $twig->renderTemplate($httpUrl, $data),
-                        'httpBody'     =>$twig->renderTemplate($httpBody, $data)
+                        'httpBody'     => $twig->renderTemplate($httpBody, $data)
                     ];
 
                     $i++;
