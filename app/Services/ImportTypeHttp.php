@@ -75,7 +75,6 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
         }
 
-
         if ($this->containsVariable($allExtractedExp, 'total')) {
             if (empty($total)) {
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
