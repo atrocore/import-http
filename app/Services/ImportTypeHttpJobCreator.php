@@ -101,8 +101,12 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         if (!empty($importFeed->getFeedField('httpConnectionId'))) {
             $connectionEntity = $this->getEntityManager()->getEntity('Connection', $importFeed->getFeedField('httpConnectionId'));
+
             if (!empty($connectionEntity)) {
-                $connectionData = $this->getContainer()->get(ConnectionOauth2::class)->connect($connectionEntity);
+                $type = $connectionEntity->get('type');
+                $connectionTypeClassName= "Atro\ConnectionType\Connection".ucfirst($type);
+                $connectionData = $this->getContainer()->get($connectionTypeClassName)->connect($connectionEntity);
+
                 $headers[] = "Authorization: {$connectionData['token_type']} {$connectionData['access_token']}";
             }
         }
@@ -112,7 +116,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                 $headers[] = "{$v['name']}: {$v['value']}";
             }
         }
-
         $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
         $attachment = $this->createAttachment($attachmentName, $output);
 
