@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp;
 
-use Treo\Core\ModuleManager\AbstractModule;
+use Atro\Core\ModuleManager\AbstractModule;
 
 class Module extends AbstractModule
 {
