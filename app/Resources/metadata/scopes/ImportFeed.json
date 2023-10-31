@@ -1,6 +1,7 @@
 {
   "connectionTypes": {
     "http": [
+      "oauth1",
       "oauth2",
       "otto"
     ]

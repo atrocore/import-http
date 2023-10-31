@@ -22,10 +22,13 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
+use Atro\ConnectionType\AbstractConnection;
+use Atro\ConnectionType\ConnectionOauth1;
 use Atro\ConnectionType\ConnectionOauth2;
 use Espo\Core\EventManager\Event;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\FilePathBuilder;
+use Espo\Core\Utils\Metadata;
 use Espo\ORM\Entity;
 use Espo\Services\QueueManagerBase;
 use Import\Entities\ImportFeed;
@@ -104,10 +107,22 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
             if (!empty($connectionEntity)) {
                 $type = $connectionEntity->get('type');
-                $connectionTypeClassName= "Atro\ConnectionType\Connection".ucfirst($type);
-                $connectionData = $this->getContainer()->get($connectionTypeClassName)->connect($connectionEntity);
+                $connectionClass = $this->getMetadata()->get(['app', 'connectionTypes', $type]);
 
-                $headers[] = "Authorization: {$connectionData['token_type']} {$connectionData['access_token']}";
+                if (empty($connectionClass)) {
+                    $connectionClass = '\\Atro\\ConnectionType\\Connection' . ucfirst($type);
+                }
+
+                /** @var AbstractConnection $connectionType */
+                $connectionType = $this->getContainer()->get($connectionClass);
+
+                $connectionType->setData([
+                    "httpUrl" => $httpUrl,
+                    "httpBody" => $httpBody
+                ]);
+
+                $connectionData = $connectionType->connect($connectionEntity);
+                $headers = array_merge($headers, $connectionType->getHeaders($connectionData));
             }
         }
 
@@ -201,5 +216,10 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         }
 
         return $this->importFeedService;
+    }
+
+    protected function getMetadata(): Metadata
+    {
+        return $this->getContainer()->get('metadata');
     }
 }
