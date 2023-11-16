@@ -118,7 +118,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
                 $connectionType->setData([
                     "httpUrl" => $httpUrl,
-                    "httpBody" => $httpBody
+                    "httpBody" => $httpBody,
+                    "method" => $httpMethod
                 ]);
 
                 $connectionData = $connectionType->connect($connectionEntity);
