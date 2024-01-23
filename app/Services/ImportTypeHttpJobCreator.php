@@ -167,6 +167,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $payload = empty($payload) ? null : json_decode(json_encode($payload));
 
         $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
+        $jobData['payload'] = $payload;
         $jobData['data']['importJobId'] = $this
             ->getImportFeedService()
             ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload)->get('id');
