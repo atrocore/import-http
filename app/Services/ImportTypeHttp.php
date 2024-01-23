@@ -41,11 +41,9 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
 
-        if(!empty($attachmentId)){
-            $attachment = $this
-                ->getEntityManager()
-                ->getEntity('Attachment', $attachmentId);
-            if(!empty($attachment)){
+        if (!empty($attachmentId)) {
+            $attachment = $this->getEntityManager()->getEntity('Attachment', $attachmentId);
+            if (!empty($attachment)) {
                 $jobCreator->createJob($importFeed, $attachment, []);
             }
             return true;
@@ -54,7 +52,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         /** @var QueueManager $queueManager */
         $queueManager = $this->getContainer()->get('queueManager');
         /** @var Twig $twig */
-        $twig =  $this->getContainer()->get('twig');
+        $twig = $this->getContainer()->get('twig');
 
         $offset = (int)$importFeed->getFeedField('httpOffset');
         $limit = (int)$importFeed->getFeedField('httpLimit');
@@ -63,9 +61,9 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         $httpBody = (string)$importFeed->getFeedField('httpBody');
         $data = ['payload' => $payload];
 
-         preg_match_all('/\{\{(.*?)}}/m', $httpUrl, $httpUrlExtractedExp, PREG_SET_ORDER, 0);
-         preg_match_all('/\{\{(.*?)}}/m', $httpBody, $httpBodyExtractedExp, PREG_SET_ORDER, 0);
-         $allExtractedExp = array_merge($httpUrlExtractedExp, $httpBodyExtractedExp);
+        preg_match_all('/\{\{(.*?)}}/m', $httpUrl, $httpUrlExtractedExp, PREG_SET_ORDER, 0);
+        preg_match_all('/\{\{(.*?)}}/m', $httpBody, $httpBodyExtractedExp, PREG_SET_ORDER, 0);
+        $allExtractedExp = array_merge($httpUrlExtractedExp, $httpBodyExtractedExp);
 
         if ($this->containsVariable($allExtractedExp, 'limit')) {
             if (empty($limit)) {
@@ -99,7 +97,11 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 $offset = $offset + $limit;
             }
 
-            $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
+            if (!empty($payload) && !empty($payload->executeNow)) {
+                $this->getService('ImportTypeHttpJobCreator')->run($jobData);
+            } else {
+                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
+            }
 
             return true;
         }
@@ -144,7 +146,12 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                     $i++;
                     $page++;
                 }
-                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
+
+                if (!empty($payload) && !empty($payload->executeNow)) {
+                    $this->getService('ImportTypeHttpJobCreator')->run($jobData);
+                } else {
+                    $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
+                }
 
                 return true;
             }
@@ -162,10 +169,10 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         return true;
     }
 
-    private function containsVariable(array $allExtractedExp, string $string)  : bool
+    private function containsVariable(array $allExtractedExp, string $string): bool
     {
-        foreach ($allExtractedExp as $exp){
-            if(strpos($exp[1],$string)  !== false){
+        foreach ($allExtractedExp as $exp) {
+            if (strpos($exp[1], $string) !== false) {
                 return true;
             }
         }

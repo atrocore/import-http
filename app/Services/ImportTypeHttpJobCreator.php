@@ -42,8 +42,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $GLOBALS['skipHooks'] = true;
 
         foreach ($data as $item) {
-            // prepare payload
-            $payload = empty($item['payload']) ? [] : json_decode(json_encode($item['payload']), true);
+            $item = json_decode(json_encode($item), true);
+
+            $payload = $item['payload'] ?? [];
 
             try {
                 $this->createJobs($item['importFeedId'], $item['httpUrl'], (string)$item['httpBody'], $payload);
