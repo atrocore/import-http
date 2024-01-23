@@ -61,7 +61,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         $total = (int)$importFeed->getFeedField('httpTotal');
         $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
         $httpBody = (string)$importFeed->getFeedField('httpBody');
-        $data = [];
+        $data = ['payload' => $payload];
 
          preg_match_all('/\{\{(.*?)}}/m', $httpUrl, $httpUrlExtractedExp, PREG_SET_ORDER, 0);
          preg_match_all('/\{\{(.*?)}}/m', $httpBody, $httpBodyExtractedExp, PREG_SET_ORDER, 0);
