@@ -26,6 +26,7 @@ use Atro\ConnectionType\AbstractConnection;
 use Atro\ConnectionType\ConnectionOauth1;
 use Atro\ConnectionType\ConnectionOauth2;
 use Espo\Core\EventManager\Event;
+use Espo\Core\EventManager\Manager;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\FilePathBuilder;
 use Espo\Core\Utils\Metadata;
@@ -80,8 +81,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $attachmentName = (new \DateTime())->format('Y-m-d_H:i:s');
 
         $headers = $this
-            ->getContainer()
-            ->get('eventManager')
+            ->getEventManager()
             ->dispatch('ImportTypeHttpJobCreatorService', 'prepareAttachmentHeaders', new Event(['importFeed' => $importFeed, 'headers' => []]))
             ->getArgument('headers');
 
@@ -175,8 +175,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp', $jobData);
 
         $this
-            ->getContainer()
-            ->get('eventManager')
+            ->getEventManager()
             ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
     }
 
@@ -222,5 +221,10 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
     protected function getMetadata(): Metadata
     {
         return $this->getContainer()->get('metadata');
+    }
+
+    protected function getEventManager(): Manager
+    {
+        return $this->getContainer()->get('eventManager');
     }
 }
