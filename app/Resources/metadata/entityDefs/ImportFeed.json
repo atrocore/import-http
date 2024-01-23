@@ -32,14 +32,16 @@
       "prohibitedEmptyValue": true
     },
     "httpUrl": {
-      "type": "varchar",
+      "type": "text",
       "notStorable": true,
-      "dataField": true
+      "dataField": true,
+      "view": "views/fields/script"
     },
     "httpBody": {
       "type": "text",
       "notStorable": true,
       "dataField": true,
+      "view": "views/fields/script",
       "useDisabledTextareaInViewMode": true
     },
     "httpOffset": {
