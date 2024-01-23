@@ -23,8 +23,6 @@ declare(strict_types=1);
 namespace ImportHttp\Services;
 
 use Atro\ConnectionType\AbstractConnection;
-use Atro\ConnectionType\ConnectionOauth1;
-use Atro\ConnectionType\ConnectionOauth2;
 use Espo\Core\EventManager\Event;
 use Espo\Core\EventManager\Manager;
 use Espo\Core\Exceptions\BadRequest;
