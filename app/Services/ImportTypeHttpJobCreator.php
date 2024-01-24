@@ -22,7 +22,8 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
-use Atro\ConnectionType\AbstractConnection;
+use Atro\ConnectionType\ConnectionInterface;
+use Atro\ConnectionType\HttpConnectionInterface;
 use Espo\Core\EventManager\Event;
 use Espo\Core\EventManager\Manager;
 use Espo\Core\Exceptions\BadRequest;
@@ -105,15 +106,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             $connectionEntity = $this->getEntityManager()->getEntity('Connection', $importFeed->getFeedField('httpConnectionId'));
 
             if (!empty($connectionEntity)) {
-                $type = $connectionEntity->get('type');
-                $connectionClass = $this->getMetadata()->get(['app', 'connectionTypes', $type]);
-
-                if (empty($connectionClass)) {
-                    $connectionClass = '\\Atro\\ConnectionType\\Connection' . ucfirst($type);
-                }
-
-                /** @var AbstractConnection $connectionType */
-                $connectionType = $this->getContainer()->get($connectionClass);
+                /** @var HttpConnectionInterface|ConnectionInterface $connectionType */
+                $connectionType = $this->getContainer()->get($this->getMetadata()->get(['app', 'connectionTypes', $connectionEntity->get('type')]));
 
                 $connectionType->setData([
                     "httpUrl" => $httpUrl,
