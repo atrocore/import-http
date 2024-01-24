@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Listeners;
 
+use Atro\ConnectionType\HttpConnectionInterface;
 use Espo\Core\EventManager\Event;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Listeners\AbstractListener;
@@ -33,10 +34,10 @@ class ImportFeedEntity extends AbstractListener
         $entity = $event->getArgument('entity');
 
         if (!empty($entity->get('httpConnectionId'))) {
-            $connectionTypes = $this->getMetadata()->get(['scopes', 'ExportFeed', 'connectionTypes', $entity->get('type')], []);
-            if (!empty($connectionTypes)) {
-                $connection = $this->getEntityManager()->getEntity('Connection', $entity->get('httpConnectionId'));
-                if (!empty($connection) && !in_array($connection->get('type'), $connectionTypes)) {
+            $connection = $this->getEntityManager()->getEntity('Connection', $entity->get('httpConnectionId'));
+            if (!empty($connection)) {
+                $connectionClass = $this->getMetadata()->get(['app', 'connectionTypes', $connection->get('type')]);
+                if (!is_a($connectionClass, HttpConnectionInterface::class, true)) {
                     throw new BadRequest('Wrong connection type.');
                 }
             }
