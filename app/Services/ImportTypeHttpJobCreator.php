@@ -102,30 +102,18 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                 break;
         }
 
-        if (!empty($importFeed->getFeedField('httpConnectionId'))) {
-            $connectionEntity = $this->getEntityManager()->getEntity('Connection', $importFeed->getFeedField('httpConnectionId'));
-
-            if (!empty($connectionEntity)) {
-                /** @var HttpConnectionInterface|ConnectionInterface $connectionType */
-                $connectionType = $this->getContainer()->get($this->getMetadata()->get(['app', 'connectionTypes', $connectionEntity->get('type')]));
-
-                $connectionType->setData([
-                    "httpUrl" => $httpUrl,
-                    "httpBody" => $httpBody,
-                    "method" => $httpMethod
-                ]);
-
-                $connectionData = $connectionType->connect($connectionEntity);
-                $headers = array_merge($headers, $connectionType->getHeaders($connectionData));
-            }
-        }
-
         if (!empty($httpHeaders)) {
             foreach ($httpHeaders as $v) {
                 $headers[] = "{$v['name']}: {$v['value']}";
             }
         }
-        $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
+
+        if (!empty($importFeed->getFeedField('httpConnectionId'))) {
+            $output = $this->createConnection($importFeed->getFeedField('httpConnectionId'))->request($httpUrl, $httpMethod, $headers, $httpBody);
+        } else {
+            $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
+        }
+
         $attachment = $this->createAttachment($attachmentName, $output);
 
         $this->createJob($importFeed, $attachment, $payload);
@@ -220,5 +208,10 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
     protected function getEventManager(): Manager
     {
         return $this->getContainer()->get('eventManager');
+    }
+
+    protected function createConnection(string $httpConnectionId): HttpConnectionInterface
+    {
+        return $this->getContainer()->get('connectionFactory')->createById($httpConnectionId);
     }
 }
