@@ -23,14 +23,11 @@ Espo.define('import-http:views/import-feed/fields/http-connection', 'views/field
 
             createDisabled: true,
 
-            selectBoolFilterList: ['notEntity', 'connectionType'],
+            selectBoolFilterList: ['notEntity', 'httpConnection'],
 
             boolFilterData: {
                 notEntity() {
                     return this.model.get('httpConnectionId');
-                },
-                connectionType() {
-                    return this.getMetadata().get(`scopes.ImportFeed.connectionTypes.${this.model.get('type')}`) || ['no-such-type'];
                 }
             },
 

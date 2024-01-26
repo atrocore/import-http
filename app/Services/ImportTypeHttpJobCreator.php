@@ -22,7 +22,8 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
-use Atro\ConnectionType\AbstractConnection;
+use Atro\ConnectionType\ConnectionInterface;
+use Atro\ConnectionType\HttpConnectionInterface;
 use Espo\Core\EventManager\Event;
 use Espo\Core\EventManager\Manager;
 use Espo\Core\Exceptions\BadRequest;
@@ -101,37 +102,18 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                 break;
         }
 
-        if (!empty($importFeed->getFeedField('httpConnectionId'))) {
-            $connectionEntity = $this->getEntityManager()->getEntity('Connection', $importFeed->getFeedField('httpConnectionId'));
-
-            if (!empty($connectionEntity)) {
-                $type = $connectionEntity->get('type');
-                $connectionClass = $this->getMetadata()->get(['app', 'connectionTypes', $type]);
-
-                if (empty($connectionClass)) {
-                    $connectionClass = '\\Atro\\ConnectionType\\Connection' . ucfirst($type);
-                }
-
-                /** @var AbstractConnection $connectionType */
-                $connectionType = $this->getContainer()->get($connectionClass);
-
-                $connectionType->setData([
-                    "httpUrl" => $httpUrl,
-                    "httpBody" => $httpBody,
-                    "method" => $httpMethod
-                ]);
-
-                $connectionData = $connectionType->connect($connectionEntity);
-                $headers = array_merge($headers, $connectionType->getHeaders($connectionData));
-            }
-        }
-
         if (!empty($httpHeaders)) {
             foreach ($httpHeaders as $v) {
                 $headers[] = "{$v['name']}: {$v['value']}";
             }
         }
-        $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
+
+        if (!empty($importFeed->getFeedField('httpConnectionId'))) {
+            $output = $this->createConnection($importFeed->getFeedField('httpConnectionId'))->request($httpUrl, $httpMethod, $headers, $httpBody);
+        } else {
+            $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
+        }
+
         $attachment = $this->createAttachment($attachmentName, $output);
 
         $this->createJob($importFeed, $attachment, $payload);
@@ -226,5 +208,10 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
     protected function getEventManager(): Manager
     {
         return $this->getContainer()->get('eventManager');
+    }
+
+    protected function createConnection(string $httpConnectionId): HttpConnectionInterface
+    {
+        return $this->getContainer()->get('connectionFactory')->createById($httpConnectionId);
     }
 }
