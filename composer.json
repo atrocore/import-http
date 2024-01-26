@@ -2,7 +2,7 @@
   "name": "atrocore/import-feeds-http",
   "default": "",
   "require": {
-    "atrocore/core": "~1.8.15",
+    "atrocore/core": "~1.8.16",
     "atrocore/import-feeds": "~1.5.0"
   },
   "autoload": {
