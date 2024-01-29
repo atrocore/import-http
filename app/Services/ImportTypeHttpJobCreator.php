@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
-use Atro\ConnectionType\ConnectionAtroCore;
+use Atro\ConnectionType\ConnectionHttp;
 use Atro\ConnectionType\HttpConnectionInterface;
 use Espo\Core\EventManager\Event;
 use Espo\Core\EventManager\Manager;
@@ -187,7 +187,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
     protected function createConnection(?string $httpConnectionId): HttpConnectionInterface
     {
         if (empty($httpConnectionId)) {
-            return $this->getContainer()->get(ConnectionAtroCore::class);
+            return $this->getContainer()->get(ConnectionHttp::class);
         }
 
         return $this->getContainer()->get('connectionFactory')->createById($httpConnectionId);
