@@ -22,7 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
-use Atro\ConnectionType\ConnectionInterface;
+use Atro\ConnectionType\ConnectionAtroCore;
 use Atro\ConnectionType\HttpConnectionInterface;
 use Espo\Core\EventManager\Event;
 use Espo\Core\EventManager\Manager;
@@ -108,39 +108,13 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             }
         }
 
-        if (!empty($importFeed->getFeedField('httpConnectionId'))) {
-            $output = $this->createConnection($importFeed->getFeedField('httpConnectionId'))->request($httpUrl, $httpMethod, $headers, $httpBody);
-        } else {
-            $output = $this->sendRequest($httpUrl, $httpMethod, $headers, $httpBody);
-        }
+        $response = $this
+            ->createConnection($importFeed->getFeedField('httpConnectionId') ?? null)
+            ->request($httpUrl, $httpMethod, $headers, $httpBody);
 
-        $attachment = $this->createAttachment($attachmentName, $output);
+        $attachment = $this->createAttachment($attachmentName, $response->getOutput());
 
         $this->createJob($importFeed, $attachment, $payload);
-    }
-
-    protected function sendRequest(string $httpUrl, string $httpMethod, array $headers, string $httpBody = null): string
-    {
-        $ch = curl_init($httpUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, empty($httpMethod) ? 'GET' : $httpMethod);
-        if (!empty($httpBody)) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $httpBody);
-        }
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        $output = curl_exec($ch);
-        if ($output === false) {
-            throw new BadRequest('Curl error: ' . curl_error($ch));
-        }
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if (!in_array($httpCode, [200, 201, 204])) {
-            throw new BadRequest("Response Code: $httpCode Body: $output");
-        }
-
-        return $output;
     }
 
     public function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
@@ -210,8 +184,12 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->getContainer()->get('eventManager');
     }
 
-    protected function createConnection(string $httpConnectionId): HttpConnectionInterface
+    protected function createConnection(?string $httpConnectionId): HttpConnectionInterface
     {
+        if (empty($httpConnectionId)) {
+            return $this->getContainer()->get(ConnectionAtroCore::class);
+        }
+
         return $this->getContainer()->get('connectionFactory')->createById($httpConnectionId);
     }
 }
