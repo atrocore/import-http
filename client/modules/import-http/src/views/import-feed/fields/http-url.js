@@ -33,7 +33,7 @@ Espo.define('import-http:views/import-feed/fields/http-url', 'views/fields/scrip
 
                 $cell.find('.fa-magic').parent().remove();
 
-                const $link = $('<a href="javascript:" class="pull-right hidden generate-url"><span class="fas fa-magic fa-sm"></span></a>');
+                const $link = $('<a href="javascript:" class="pull-right hidden generate-url" title="' + this.translate('generateURL', 'labels', 'ImportFeed') + '"><span class="fas fa-magic fa-sm"></span></a>');
 
                 $cell.prepend($link);
 

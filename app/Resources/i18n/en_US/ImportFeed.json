@@ -14,7 +14,8 @@
   },
   "labels": {
     "http": "HTTP Request",
-    "execute": "Execute"
+    "execute": "Execute",
+    "generateURL": "Generate URL"
   },
   "messages": {
     "confirmUrlGeneration": "Are you sure you want to generate URL?"

@@ -7,7 +7,8 @@
   },
   "labels": {
     "http": "HTTP Запрос",
-    "execute": "Выполнить"
+    "execute": "Выполнить",
+    "generateURL": "Создать URL-адрес"
   },
   "messages": {
     "confirmUrlGeneration": "Вы уверены, что хотите сгенерировать URL?"
