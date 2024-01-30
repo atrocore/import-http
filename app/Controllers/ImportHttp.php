@@ -27,16 +27,29 @@ use Espo\Core\Exceptions\Forbidden;
 
 class ImportHttp extends \Espo\Core\Controllers\Base
 {
-    public function actionGetAllColumns($params, $data, $request): array
+    public function actionGenerateURL($params, $data, $request): array
     {
-        if (!$request->isGet()) {
+        if (!$request->isPost()) {
             throw new BadRequest();
         }
 
-        if (!$this->getAcl()->check('ImportFeed', 'read')) {
+        if (!$this->getAcl()->check('ImportFeed', 'edit')) {
             throw new Forbidden();
         }
 
-        return $this->getService('ImportTypeHttp')->getAllColumns((string)$request->get('httpUrl'), (string)$request->get('adapter'), (string)$request->get('importFeedId'));
+        return $this->getService('ImportTypeHttp')->generateURL($data);
+    }
+
+    public function actionGenerateSourceFields($params, $data, $request): array
+    {
+        if (!$request->isPost()) {
+            throw new BadRequest();
+        }
+
+        if (!$this->getAcl()->check('ImportFeed', 'edit')) {
+            throw new Forbidden();
+        }
+
+        return $this->getService('ImportTypeHttp')->generateSourceFields($data);
     }
 }

@@ -29,6 +29,7 @@ use Espo\Core\EventManager\Manager;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\FilePathBuilder;
 use Espo\Core\Utils\Metadata;
+use Espo\Core\Utils\Util;
 use Espo\ORM\Entity;
 use Espo\Services\QueueManagerBase;
 use Import\Entities\ImportFeed;
@@ -70,6 +71,31 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
 
+        $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
+
+        $this->createJob($importFeed, $attachment, $payload);
+    }
+
+    public function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
+    {
+        // prepare payload
+        $payload = empty($payload) ? null : json_decode(json_encode($payload));
+
+        $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
+        $jobData['payload'] = $payload;
+        $jobData['data']['importJobId'] = $this
+            ->getImportFeedService()
+            ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload)->get('id');
+
+        $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp', $jobData);
+
+        $this
+            ->getEventManager()
+            ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
+    }
+
+    public function createAttachmentViaHttpRequest(Entity $importFeed, string $httpUrl, string $httpBody): Entity
+    {
         $httpMethod = $importFeed->getFeedField('httpMethod');
         $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
         $fileFormat = $importFeed->getFeedField('format');
@@ -78,7 +104,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             throw new BadRequest('Validation failed. Format is required.');
         }
 
-        $attachmentName = (new \DateTime())->format('Y-m-d_H:i:s');
+        $attachmentName = preg_replace('/[^a-z0-9_]/', '', str_replace(' ', '_', strtolower($importFeed->get('name'))));
+        $attachmentName .= '_' . Util::generateId();
 
         $headers = $this
             ->getEventManager()
@@ -112,27 +139,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             ->createConnection($importFeed->getFeedField('httpConnectionId') ?? null)
             ->request($httpUrl, $httpMethod, $headers, $httpBody);
 
-        $attachment = $this->createAttachment($attachmentName, $response->getOutput());
-
-        $this->createJob($importFeed, $attachment, $payload);
-    }
-
-    public function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
-    {
-        // prepare payload
-        $payload = empty($payload) ? null : json_decode(json_encode($payload));
-
-        $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
-        $jobData['payload'] = $payload;
-        $jobData['data']['importJobId'] = $this
-            ->getImportFeedService()
-            ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload)->get('id');
-
-        $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp', $jobData);
-
-        $this
-            ->getEventManager()
-            ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
+        return $this->createAttachment($attachmentName, $response->getOutput());
     }
 
     protected function createAttachment(string $name, string $contents): Entity
@@ -184,7 +191,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->getContainer()->get('eventManager');
     }
 
-    protected function createConnection(?string $httpConnectionId): HttpConnectionInterface
+    public function createConnection(?string $httpConnectionId): HttpConnectionInterface
     {
         if (empty($httpConnectionId)) {
             return $this->getContainer()->get(ConnectionHttp::class);

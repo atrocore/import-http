@@ -1,0 +1,8 @@
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Заголовок імпортного фіда"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Заголовки імпортного фіда"
+  }
+}

@@ -31,11 +31,14 @@
       "dataField": true,
       "prohibitedEmptyValue": true
     },
+    "sourceFields": {
+      "view": "import-http:views/import-feed/fields/source-fields"
+    },
     "httpUrl": {
       "type": "text",
       "notStorable": true,
       "dataField": true,
-      "view": "views/fields/script"
+      "view": "import-http:views/import-feed/fields/http-url"
     },
     "httpBody": {
       "type": "text",

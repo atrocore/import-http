@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
+use Atro\ConnectionType\HttpConnectionInterface;
 use Atro\Core\Twig\Twig;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\QueueManager;
@@ -34,6 +35,60 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
     {
         // disable notifications, because for big count of jobs it looks like spam
         return '';
+    }
+
+    public function generateURL(\stdClass $input): array
+    {
+        if (empty($input->importFeedId)) {
+            throw new BadRequest('Import Feed ID is required');
+        }
+
+        $importFeed = $this->getService('ImportFeed')->getEntity($input->importFeedId);
+        if (empty($importFeed)) {
+            throw new BadRequest("Import Feed with ID '{$input->importFeedId}' does not exists.");
+        }
+
+        /** @var HttpConnectionInterface $connectionType */
+        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($importFeed->get('httpConnectionId'));
+
+        return ['url' => $connectionType->generateUrlForEntity($importFeed->get('entity'))];
+    }
+
+    public function generateSourceFields(\stdClass $input): array
+    {
+        if (empty($input->importFeedId)) {
+            throw new BadRequest('Import Feed ID is required');
+        }
+
+        $importFeed = $this->getService('ImportFeed')->getEntity($input->importFeedId);
+        if (empty($importFeed)) {
+            throw new BadRequest("Import Feed with ID '{$input->importFeedId}' does not exists.");
+        }
+
+        $httpUrl = $this->getContainer()->get('twig')
+            ->renderTemplate((string)$importFeed->get('httpUrl'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
+
+        $attachment = $this
+            ->getService('ImportTypeHttpJobCreator')
+            ->createAttachmentViaHttpRequest($importFeed, $httpUrl, '');
+
+        $payload = new \stdClass();
+        $payload->attachmentId = $attachment->get('id');
+        $payload->format = $importFeed->get('format');
+        $payload->delimiter = $importFeed->get('fileFieldDelimiter');
+        $payload->enclosure = ($importFeed->get('fileTextQualifier') == 'singleQuote') ? "'" : '"';
+        $payload->isFileHeaderRow = $importFeed->get('isFileHeaderRow');
+        $payload->sheet = $importFeed->get('sheet');
+        $payload->excludedNodes = $importFeed->get('excludedNodes');
+        $payload->keptStringNodes = $importFeed->get('keptStringNodes');
+
+        $sourceFields = $this->getService('ImportFeed')->getFileColumns($payload);
+
+        return [
+            'fileId'       => $attachment->get('id'),
+            'fileName'     => $attachment->get('name'),
+            'sourceFields' => $sourceFields
+        ];
     }
 
     public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool

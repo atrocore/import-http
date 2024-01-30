@@ -7,7 +7,13 @@
   },
   "labels": {
     "http": "HTTP Запрос",
-    "execute": "Выполнить"
+    "execute": "Выполнить",
+    "generateURL": "Создать URL-адрес",
+    "generateSourceFields": "Создать исходные поля"
+  },
+  "messages": {
+    "confirmUrlGeneration": "Вы уверены, что хотите сгенерировать URL?",
+    "confirmSourceFieldsGeneration": "Вы уверены, что хотите сгенерировать исходные поля?"
   },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL или Request Body нельзя сформировать, пожалуйста проверьте параметры Offset, Limit и Total records."
