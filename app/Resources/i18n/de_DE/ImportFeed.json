@@ -9,6 +9,9 @@
     "http": "HTTP Anfrage",
     "execute": "Ausführen"
   },
+  "messages": {
+    "confirmUrlGeneration": "Sind Sie sicher, dass Sie eine URL generieren wollen?"
+  },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL oder Request Body kann nicht gebildet werden, bitte überprüfen Sie Ihre Parameter für Offset, Limit und Total Records."
   }

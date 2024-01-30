@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Services;
 
+use Atro\ConnectionType\HttpConnectionInterface;
 use Atro\Core\Twig\Twig;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\QueueManager;
@@ -34,6 +35,14 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
     {
         // disable notifications, because for big count of jobs it looks like spam
         return '';
+    }
+
+    public function generateURL(\stdClass $input): array
+    {
+        /** @var HttpConnectionInterface $connectionType */
+        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($input->connectionId ?? null);
+
+        return ['url' => $connectionType->generateUrlForEntity($input->entity ?? '')];
     }
 
     public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool

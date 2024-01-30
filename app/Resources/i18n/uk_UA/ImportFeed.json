@@ -1,0 +1,18 @@
+{
+  "fields": {
+    "importHttpHeaders": "Заголовки"
+  },
+  "links": {
+    "importHttpHeaders": "Заголовки"
+  },
+  "labels": {
+    "http": "HTTP Запит",
+    "execute": "Виконати"
+  },
+  "messages": {
+    "confirmUrlGeneration": "Ви впевнені, що хочете згенерувати URL-адресу?"
+  },
+  "exceptions": {
+    "urlOrBodyCannotBeFormed": "URL або Request Body не можна сформувати, будь ласка перевірте параметри Offset, Limit та Total records."
+  }
+}

@@ -184,7 +184,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->getContainer()->get('eventManager');
     }
 
-    protected function createConnection(?string $httpConnectionId): HttpConnectionInterface
+    public function createConnection(?string $httpConnectionId): HttpConnectionInterface
     {
         if (empty($httpConnectionId)) {
             return $this->getContainer()->get(ConnectionHttp::class);
