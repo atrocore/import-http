@@ -26,6 +26,7 @@ use Atro\ConnectionType\HttpConnectionInterface;
 use Atro\Core\Twig\Twig;
 use Espo\Core\Exceptions\BadRequest;
 use Espo\Core\QueueManager;
+use Espo\Core\Utils\Util;
 use Espo\ORM\Entity;
 use Import\Entities\ImportFeed;
 
@@ -65,15 +66,24 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             throw new BadRequest("Import Feed with ID '{$input->importFeedId}' does not exists.");
         }
 
+        $attachmentName = preg_replace('/[^a-z0-9_]/', '', str_replace(' ', '_', strtolower($importFeed->get('name'))));
+        $attachmentName .= '_' . Util::generateId();
+
         switch ($importFeed->get('format')) {
             case 'JSON':
                 $headers[] = 'Content-Type: application/json';
+                $attachmentName .= '.json';
                 break;
             case 'XML':
                 $headers[] = 'Content-Type: application/xml';
+                $attachmentName .= '.xml';
                 break;
-            default:
-                throw new BadRequest('Wrong Format given.');
+            case 'CSV':
+                $attachmentName .= '.csv';
+                break;
+            case 'Excel':
+                $attachmentName .= '.xlsx';
+                break;
         }
 
         $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
@@ -95,27 +105,29 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         $httpUrl = $twig->renderTemplate((string)$importFeed->get('httpUrl'), $data);
         $httpBody = $twig->renderTemplate((string)$importFeed->get('httpBody'), $data);
 
-        /** @var HttpConnectionInterface $connectionType */
-        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($importFeed->get('httpConnectionId'));
+        /** @var ImportTypeHttpJobCreator $service */
+        $service = $this->getService('ImportTypeHttpJobCreator');
 
-        $response = $connectionType->request($httpUrl, $importFeed->get('httpMethod'), $headers, $httpBody);
-        $contents = $response->getOutput();
+        $response = $service->createConnection($importFeed->get('httpConnectionId'))->request($httpUrl, $importFeed->get('httpMethod'), $headers, $httpBody);
+        $attachment = $service->createAttachment($attachmentName, $response->getOutput());
 
-        if ($importFeed->get('format') === 'XML') {
-            $contents = json_encode(simplexml_load_string($contents));
-        }
+        $payload = new \stdClass();
+        $payload->attachmentId = $attachment->get('id');
+        $payload->format = $importFeed->get('format');
+        $payload->delimiter = $importFeed->get('fileFieldDelimiter');
+        $payload->enclosure = ($importFeed->get('fileTextQualifier') == 'singleQuote') ? "'" : '"';
+        $payload->isFileHeaderRow = $importFeed->get('isFileHeaderRow');
+        $payload->sheet = $importFeed->get('sheet');
+        $payload->excludedNodes = $importFeed->get('excludedNodes');
+        $payload->keptStringNodes = $importFeed->get('keptStringNodes');
 
-        $data = \Import\Core\Utils\JsonToVerticalArray::mutate(
-            $contents,
-            [
-                'data' => [
-                    'excludedNodes'   => $importFeed->get('excludedNodes'),
-                    'keptStringNodes' => $importFeed->get('keptStringNodes')
-                ]
-            ]
-        );
+        $sourceFields = $this->getService('ImportFeed')->getFileColumns($payload);
 
-        return ['sourceFields' => empty($data[0]) ? [] : array_keys($data[0])];
+        return [
+            'fileId'       => $attachment->get('id'),
+            'fileName'     => $attachment->get('name'),
+            'sourceFields' => $sourceFields
+        ];
     }
 
     public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool

@@ -33,6 +33,10 @@ Espo.define('import-http:views/import-feed/fields/source-fields', 'import:views/
 
                 $cell.find('.fa-magic').parent().remove();
 
+                if (!this.model.get('httpUrl')) {
+                    return;
+                }
+
                 const $link = $('<a href="javascript:" class="pull-right hidden generate-source-fields" title="' + this.translate('generateSourceFields', 'labels', 'ImportFeed') + '"><span class="fas fa-magic fa-sm"></span></a>');
 
                 $cell.prepend($link);
@@ -43,14 +47,10 @@ Espo.define('import-http:views/import-feed/fields/source-fields', 'import:views/
                         confirmText: this.translate('Apply')
                     }, () => {
                         this.ajaxPostRequest('ImportHttp/action/generateSourceFields', {importFeedId: this.model.get('id')}).then(res => {
-                            if (res[this.name] === this.model.get(this.name)) {
-                                Espo.Ui.notify(this.translate('notModified', 'messages'), 'warning');
-                            } else {
-                                this.model.set(this.name, res[this.name]);
-                                this.model.save().then(() => {
-                                    this.notify('Saved', 'success');
-                                });
-                            }
+                            this.model.set(res);
+                            this.model.save().then(() => {
+                                this.notify('Saved', 'success');
+                            });
                         });
                     });
 

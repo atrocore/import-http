@@ -135,7 +135,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
     }
 
-    protected function createAttachment(string $name, string $contents): Entity
+    public function createAttachment(string $name, string $contents): Entity
     {
         $repository = $this->getEntityManager()->getRepository('Attachment');
 
