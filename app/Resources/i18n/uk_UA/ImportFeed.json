@@ -8,10 +8,12 @@
   "labels": {
     "http": "HTTP Запит",
     "execute": "Виконати",
-    "generateURL": "Згенерувати URL-адресу"
+    "generateURL": "Згенерувати URL-адресу",
+    "generateSourceFields": "Згенерувати вихідні поля"
   },
   "messages": {
-    "confirmUrlGeneration": "Ви впевнені, що хочете згенерувати URL-адресу?"
+    "confirmUrlGeneration": "Ви впевнені, що хочете згенерувати URL-адресу?",
+    "confirmSourceFieldsGeneration": "Ви впевнені, що хочете згенерувати вихідні поля?"
   },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL або Request Body не можна сформувати, будь ласка перевірте параметри Offset, Limit та Total records."

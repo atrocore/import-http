@@ -31,6 +31,9 @@
       "dataField": true,
       "prohibitedEmptyValue": true
     },
+    "sourceFields": {
+      "view": "import-http:views/import-feed/fields/source-fields"
+    },
     "httpUrl": {
       "type": "text",
       "notStorable": true,
