@@ -39,10 +39,83 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
     public function generateURL(\stdClass $input): array
     {
-        /** @var HttpConnectionInterface $connectionType */
-        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($input->connectionId ?? null);
+        if (empty($input->importFeedId)) {
+            throw new BadRequest('Import Feed ID is required');
+        }
 
-        return ['url' => $connectionType->generateUrlForEntity($input->entity ?? '')];
+        $importFeed = $this->getService('ImportFeed')->getEntity($input->importFeedId);
+        if (empty($importFeed)) {
+            throw new BadRequest("Import Feed with ID '{$input->importFeedId}' does not exists.");
+        }
+
+        /** @var HttpConnectionInterface $connectionType */
+        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($importFeed->get('httpConnectionId'));
+
+        return ['url' => $connectionType->generateUrlForEntity($importFeed->get('entity'))];
+    }
+
+    public function generateSourceFields(\stdClass $input): array
+    {
+        if (empty($input->importFeedId)) {
+            throw new BadRequest('Import Feed ID is required');
+        }
+
+        $importFeed = $this->getService('ImportFeed')->getEntity($input->importFeedId);
+        if (empty($importFeed)) {
+            throw new BadRequest("Import Feed with ID '{$input->importFeedId}' does not exists.");
+        }
+
+        switch ($importFeed->get('format')) {
+            case 'JSON':
+                $headers[] = 'Content-Type: application/json';
+                break;
+            case 'XML':
+                $headers[] = 'Content-Type: application/xml';
+                break;
+            default:
+                throw new BadRequest('Wrong Format given.');
+        }
+
+        $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
+        if (!empty($httpHeaders)) {
+            foreach ($httpHeaders as $v) {
+                $headers[] = "{$v['name']}: {$v['value']}";
+            }
+        }
+
+        $data = [
+            'total'  => 5,
+            'limit'  => 5,
+            'offset' => 0
+        ];
+
+        /** @var Twig $twig */
+        $twig = $this->getContainer()->get('twig');
+
+        $httpUrl = $twig->renderTemplate((string)$importFeed->get('httpUrl'), $data);
+        $httpBody = $twig->renderTemplate((string)$importFeed->get('httpBody'), $data);
+
+        /** @var HttpConnectionInterface $connectionType */
+        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($importFeed->get('httpConnectionId'));
+
+        $response = $connectionType->request($httpUrl, $importFeed->get('httpMethod'), $headers, $httpBody);
+        $contents = $response->getOutput();
+
+        if ($importFeed->get('format') === 'XML') {
+            $contents = json_encode(simplexml_load_string($contents));
+        }
+
+        $data = \Import\Core\Utils\JsonToVerticalArray::mutate(
+            $contents,
+            [
+                'data' => [
+                    'excludedNodes'   => $importFeed->get('excludedNodes'),
+                    'keptStringNodes' => $importFeed->get('keptStringNodes')
+                ]
+            ]
+        );
+
+        return ['sourceFields' => empty($data[0]) ? [] : array_keys($data[0])];
     }
 
     public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool

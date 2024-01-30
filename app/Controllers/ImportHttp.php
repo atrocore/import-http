@@ -39,4 +39,17 @@ class ImportHttp extends \Espo\Core\Controllers\Base
 
         return $this->getService('ImportTypeHttp')->generateURL($data);
     }
+
+    public function actionGenerateSourceFields($params, $data, $request): array
+    {
+        if (!$request->isPost()) {
+            throw new BadRequest();
+        }
+
+        if (!$this->getAcl()->check('ImportFeed', 'edit')) {
+            throw new Forbidden();
+        }
+
+        return $this->getService('ImportTypeHttp')->generateSourceFields($data);
+    }
 }
