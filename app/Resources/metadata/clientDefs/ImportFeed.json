@@ -96,6 +96,19 @@
             }
           ]
         }
+      },
+      "httpConnectionId": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
       }
     }
   }
