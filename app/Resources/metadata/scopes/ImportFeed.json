@@ -1,0 +1,6 @@
+{
+  "duplicatableRelations": [
+    "__APPEND__",
+    "importHttpHeaders"
+  ]
+}
