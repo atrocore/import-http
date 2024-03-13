@@ -1,4 +1,4 @@
-# EULA - End-User License Agreement of AtroCore (haftungsbeschränkt)
+# EULA - End-User License Agreement of AtroCore GmbH
 
 Valid from: 09.10.2020
 
@@ -13,9 +13,9 @@ if you do not agree to the terms and conditions of this Agreement, you should no
 - Free and paid support can be provided
 
 ## 1. Preamble
-1.1. The Scope of this Agreement (hereinafter: Agreement) applies to all proprietary standard software (hereinafter: the Software) provided by AtroCore UG (haftungsbeschränkt) to the Licensee in return for payment.
+1.1. The Scope of this Agreement (hereinafter: Agreement) applies to all proprietary standard software (hereinafter: the Software) provided by AtroCore GmbH to the Licensee in return for payment.
 
-1.2. This Agreement governs the relationship between Licensee, which is a legal entity (hereinafter: Licensee) and AtroCore UG (haftungsbeschränkt, hereinafter: Licensor). 
+1.2. This Agreement governs the relationship between Licensee, which is a legal entity (hereinafter: Licensee) and AtroCore GmbH (hereinafter: Licensor).
 
 1.3. This Agreement sets the terms, rights, restrictions and obligations on using the Software created and owned by Licensor.
 
