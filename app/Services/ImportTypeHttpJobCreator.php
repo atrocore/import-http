@@ -139,43 +139,29 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             ->createConnection($importFeed->getFeedField('httpConnectionId') ?? null)
             ->request($httpUrl, $httpMethod, $headers, $httpBody);
 
-        return $this->createAttachment($attachmentName, $response->getOutput());
+        $folder = $this->getImportFeedService()->createImportFileFolder($importFeed);
+        return $this->createAttachment($attachmentName, $response->getOutput(), $folder->get('id'));
     }
 
-    protected function createAttachment(string $name, string $contents): Entity
+    protected function createAttachment(string $name, string $contents, string $folderId): Entity
     {
-        $repository = $this->getEntityManager()->getRepository('Attachment');
+        $input = new \stdClass();
+        $input->name = $name;
+        $input->hidden = true;
+        $input->folderId = $folderId;
 
-        $attachment = $repository->get();
-        $attachment->set('name', $name);
-        $attachment->set('storageFilePath', $repository->getDestPath(FilePathBuilder::UPLOAD));
-        $attachment->set('storageThumbPath', $repository->getDestPath(FilePathBuilder::UPLOAD));
-        $attachment->set('relatedType', 'Asset');
-        $attachment->set('field', 'file');
+        $fileData = $this->getService('File')->createFileViaContents($input, $contents);
+        return $this->getEntityManager()->getRepository('File')->get($fileData['id']);
+    }
 
-        $fullPath = $this->getConfig()->get('filesPath', 'upload/files/') . $attachment->get('storageFilePath');
-        while (!file_exists($fullPath)) {
-            mkdir($fullPath, 0777, true);
-            usleep(100);
-        }
-
-        $fileName = $fullPath . '/' . $name;
-
-        file_put_contents($fileName, $contents);
-
-        $attachment->set('md5', md5_file($fileName));
-        $attachment->set('size', filesize($fileName));
-        $attachment->set('type', mime_content_type($fileName));
-
-        $repository->save($attachment, ['skipAll' => true]);
-
-        return $attachment;
+    protected  function getService($serviceName) {
+        return $this->getContainer()->get('serviceFactory')->create($serviceName);
     }
 
     protected function getImportFeedService(): \Import\Services\ImportFeed
     {
         if (empty($this->importFeedService)) {
-            $this->importFeedService = $this->getContainer()->get('serviceFactory')->create('ImportFeed');
+            $this->importFeedService = $this->getService('ImportFeed');
         }
 
         return $this->importFeedService;
