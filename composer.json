@@ -2,8 +2,8 @@
   "name": "atrocore/import-feeds-http",
   "default": "",
   "require": {
-    "atrocore/core": ">=1.8.19 <1.10.0",
-    "atrocore/import-feeds": "~1.5.55"
+    "atrocore/core": ">=1.10.0 <1.11.0",
+    "atrocore/import-feeds": "~1.6.0"
   },
   "autoload": {
     "psr-4": {
