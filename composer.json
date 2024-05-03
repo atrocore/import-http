@@ -1,9 +1,9 @@
 {
-  "name": "atrocore/import-feeds-http",
+  "name": "atrocore/import-http",
   "default": "",
   "require": {
     "atrocore/core": ">=1.10.0 <1.11.0",
-    "atrocore/import-feeds": "~1.6.0"
+    "atrocore/import": "~1.6.0"
   },
   "autoload": {
     "psr-4": {
@@ -13,7 +13,7 @@
   "extra": {
     "treoId": "ImportHttp",
     "name": {
-      "default": "Import Feeds: HTTP Request"
+      "default": "Import: HTTP Request"
     },
     "description": {
       "default": "This module allows you to import any structured data manually or automatically via HTTP request. Any REST/SOAP API calls can be executed. Use this module for seamless system integration."
