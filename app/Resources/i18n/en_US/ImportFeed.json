@@ -7,7 +7,8 @@
     "httpMethod": "Method",
     "httpConnectionId": "Connection",
     "httpBody": "Request Body",
-    "importHttpHeaders": "Headers"
+    "importHttpHeaders": "Headers",
+    "httpConnectionName": "Connection Name"
   },
   "links": {
     "importHttpHeaders": "Headers"
