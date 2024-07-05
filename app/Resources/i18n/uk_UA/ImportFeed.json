@@ -1,6 +1,7 @@
 {
   "fields": {
-    "importHttpHeaders": "Заголовки"
+    "importHttpHeaders": "Заголовки",
+    "httpConnectionName": "Назва з'єднання"
   },
   "links": {
     "importHttpHeaders": "Заголовки"
