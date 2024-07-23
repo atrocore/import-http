@@ -27,7 +27,6 @@ use Atro\ConnectionType\HttpConnectionInterface;
 use Espo\Core\EventManager\Event;
 use Espo\Core\EventManager\Manager;
 use Espo\Core\Exceptions\BadRequest;
-use Espo\Core\FilePathBuilder;
 use Espo\Core\Utils\Metadata;
 use Espo\Core\Utils\Util;
 use Espo\ORM\Entity;
@@ -46,7 +45,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         foreach ($data as $item) {
             $item = json_decode(json_encode($item), true);
 
-            $payload = $item['payload'] ?? [];
+            $payload = $item['payload'] ?? new \stdClass();
 
             try {
                 $this->createJobs($item['importFeedId'], $item['httpUrl'], (string)$item['httpBody'], $payload);
@@ -63,24 +62,27 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
-    public function createJobs(string $importFeedId, string $httpUrl, string $httpBody, array $payload = []): void
+    public function createJobs(string $importFeedId, string $httpUrl, string $httpBody, \stdClass $payload): void
     {
         if (empty($httpUrl)) {
             throw new BadRequest('Validation failed. URL is required.');
         }
 
+        /** @var ImportFeed $importFeed */
         $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
 
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
+        if ($this->getImportFeedService()->hasParentJob($importFeed)) {
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $payload->parentJobId = $parentJob->get('id');
+        }
+
         $this->createJob($importFeed, $attachment, $payload);
     }
 
-    public function createJob(ImportFeed $importFeed, Entity $attachment, array $payload = []): void
+    public function createJob(ImportFeed $importFeed, Entity $attachment, \stdClass $payload): void
     {
-        // prepare payload
-        $payload = empty($payload) ? null : json_decode(json_encode($payload));
-
         $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
         $jobData['payload'] = $payload;
         $jobData['data']['importJobId'] = $this
