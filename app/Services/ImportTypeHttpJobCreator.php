@@ -45,7 +45,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         foreach ($data as $item) {
             $item = json_decode(json_encode($item), true);
 
-            $payload = $item['payload'] ?? new \stdClass();
+            $payload = !empty($item['payload']) ? json_decode(json_encode($item['payload'])) : new \stdClass();
 
             try {
                 $this->createJobs($item['importFeedId'], $item['httpUrl'], (string)$item['httpBody'], $payload);
