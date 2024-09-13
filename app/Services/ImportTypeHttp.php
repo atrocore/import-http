@@ -95,11 +95,20 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
     {
         /** @var ImportTypeHttpJobCreator $jobCreator */
         $jobCreator = $this->getService('ImportTypeHttpJobCreator');
+        /** @var \Import\Services\ImportFeed $service */
+        $service = $this->getService('ImportFeed');
 
         if (!empty($attachmentId)) {
-            $attachment = $this->getEntityManager()->getEntity('Attachment', $attachmentId);
+            $attachment = $this->getEntityManager()->getEntity('File', $attachmentId);
+
             if (!empty($attachment)) {
-                $jobCreator->createJob($importFeed, $attachment, []);
+                $payload = new \stdClass();
+                if ($service->hasParentJob($importFeed)) {
+                    $parentJob = $service->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+                    $payload->parentJobId = $parentJob->get('id');
+                }
+
+                $jobCreator->createJob($importFeed, $attachment, $payload);
             }
             return true;
         }
