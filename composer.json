@@ -2,8 +2,8 @@
   "name": "atrocore/import-http",
   "default": "",
   "require": {
-    "atrocore/core": ">=1.10.0 <1.11.0",
-    "atrocore/import": "~1.6.0"
+    "atrocore/core": ">=1.10.0 <1.12.0",
+    "atrocore/import": "~1.6.33"
   },
   "autoload": {
     "psr-4": {
@@ -11,7 +11,7 @@
     }
   },
   "extra": {
-    "treoId": "ImportHttp",
+    "atroId": "ImportHttp",
     "name": {
       "default": "Import: HTTP Request"
     },
