@@ -152,7 +152,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $input->folderId = $folderId;
 
         $fileData = $this->getService('File')->createFileViaContents($input, $contents);
-        return $this->getEntityManager()->getRepository('File')->get($fileData['id']);
+
+        return is_array($fileData) ? $this->getEntityManager()->getRepository('File')->get($fileData['id']) : $fileData;
     }
 
     protected  function getService($serviceName) {
