@@ -150,6 +150,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $input->name = $name;
         $input->hidden = true;
         $input->folderId = $folderId;
+        $input->fileId = null;
 
         $fileData = $this->getService('File')->createFileViaContents($input, $contents);
 
