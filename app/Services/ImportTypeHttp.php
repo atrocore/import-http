@@ -97,7 +97,6 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 if ($service->hasParentJob($importFeed)) {
                     $parentJob = $service->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
                     $payload->parentJobId = $parentJob->get('id');
-                    $jobCreator->createConvertedFileForParentJob($parentJob, $attachmentId);
                 }
 
                 $jobCreator->createJob($importFeed, $attachment, $payload);
