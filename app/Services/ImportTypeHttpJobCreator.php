@@ -53,13 +53,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
-    public function createConvertedFileForParentJob(Entity $parentJob, string $fileId): void
-    {
-        /** @var \Import\Services\ImportTypeSimple $service */
-        $service = $this->getService('ImportTypeSimple');
-        $service->createConvertedFile($parentJob->get('id'), $service->prepareJobData($parentJob->get('importFeed'), $fileId));
-    }
-
     public function createJobs(string $importFeedId, string $httpUrl, string $httpBody, \stdClass $payload): void
     {
         if (empty($httpUrl)) {
@@ -74,7 +67,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         if ($this->getImportFeedService()->hasParentJob($importFeed)) {
             $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
-            $this->createConvertedFileForParentJob($parentJob, $attachment->get('id'));
         }
 
         $this->createJob($importFeed, $attachment, $payload);
