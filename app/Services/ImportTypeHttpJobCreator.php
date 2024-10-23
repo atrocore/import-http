@@ -41,7 +41,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         if ($combine) {
             $file = $this->createCombinedFile($data);
             echo '<pre>';
-            print_r('123');
+            print_r($file->get('id'));
             die();
         }
 
@@ -157,14 +157,15 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $files = [];
         foreach ($data as $v) {
+            /** @var ImportTypeSimple $service */
+            $service = $this->getService('ImportTypeSimple');
             try {
                 $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
+                $jobData = $service->prepareJobData($importFeed, $attachment->get('id'));
+                $convertedFile = $service->createConvertedFile($importFeed, $jobData);
             } catch (\Throwable $e) {
                 continue;
             }
-            $jobData = $this->createImportTypeSimpleService()->prepareJobData($importFeed, $attachment->get('id'));
-            $convertedFile = $this->createImportTypeSimpleService()->createConvertedFile($importFeed, $jobData);
-
             $files[] = $convertedFile->getFilePath();
         }
 
@@ -179,12 +180,10 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $this->combineCSVs($files, $tmpFile, $jobData['delimiter'], $jobData['enclosure']);
 
-        $folder = $this->getImportFeedService()->createImportFileFolder($importFeed);
-
         $input = new \stdClass();
         $input->name = $this->createFileName($importFeed->get('name'), 'csv');
         $input->hidden = true;
-        $input->folderId = $folder->get('id');
+        $input->folderId = $this->getImportFeedService()->createImportFileFolder($importFeed)->get('id');
 
         $file = $this->getService('File')->moveLocalFileToFileEntity($input, $tmpFile);
 
@@ -251,11 +250,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
     protected function getService(string $serviceName)
     {
         return $this->getContainer()->get('serviceFactory')->create($serviceName);
-    }
-
-    protected function createImportTypeSimpleService(): ImportTypeSimple
-    {
-        return $this->getContainer()->get('serviceFactory')->create('ImportTypeSimple');
     }
 
     protected function getImportFeedService(): \Import\Services\ImportFeed
