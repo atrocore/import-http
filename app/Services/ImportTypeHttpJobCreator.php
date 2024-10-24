@@ -39,10 +39,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $combine = true;
         if ($combine) {
-            $file = $this->createCombinedFile($data);
-            echo '<pre>';
-            print_r($file->get('id'));
-            die();
+            $this->createCombinedJob($data);
+
+            return true;
         }
 
         foreach ($data as $item) {
@@ -74,7 +73,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
         if ($this->getImportFeedService()->hasParentJob($importFeed)) {
-            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed,
+                $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }
 
@@ -83,17 +83,21 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
     public function createJob(ImportFeed $importFeed, Entity $attachment, \stdClass $payload): void
     {
-        $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed, $attachment->get('id'), true);
+        $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed,
+            $attachment->get('id'), true);
         $jobData['payload'] = $payload;
         $jobData['data']['importJobId'] = $this
             ->getImportFeedService()
-            ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload)->get('id');
+            ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'),
+                $payload)->get('id');
 
-        $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp', $jobData);
+        $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp',
+            $jobData);
 
         $this
             ->getEventManager()
-            ->dispatch('ImportFeedService', 'afterImportJobsCreations', new Event(['importFeedId' => $importFeed->get('id')]));
+            ->dispatch('ImportFeedService', 'afterImportJobsCreations',
+                new Event(['importFeedId' => $importFeed->get('id')]));
     }
 
     public function createAttachmentViaHttpRequest(Entity $importFeed, string $httpUrl, string $httpBody): Entity
@@ -108,7 +112,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $headers = $this
             ->getEventManager()
-            ->dispatch('ImportTypeHttpJobCreatorService', 'prepareAttachmentHeaders', new Event(['importFeed' => $importFeed, 'headers' => []]))
+            ->dispatch('ImportTypeHttpJobCreatorService', 'prepareAttachmentHeaders',
+                new Event(['importFeed' => $importFeed, 'headers' => []]))
             ->getArgument('headers');
 
         $ext = 'csv';
@@ -142,7 +147,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->createAttachment($attachmentName, $response->getOutput(), $folder->get('id'));
     }
 
-    protected function createCombinedFile(array $data): Entity
+    protected function createCombinedJob(array $data): void
     {
         $importFeedId = $data[0]['importFeedId'] ?? null;
         if (empty($importFeedId)) {
@@ -155,6 +160,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             throw new BadRequest("Creating combined file failed. ImportFeed $importFeedId not found.");
         }
 
+        $convertedFiles = [];
         $files = [];
         foreach ($data as $v) {
             /** @var ImportTypeSimple $service */
@@ -166,7 +172,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             } catch (\Throwable $e) {
                 continue;
             }
+            $convertedFiles[] = $convertedFile;
             $files[] = $convertedFile->getFilePath();
+            $this->getEntityManager()->removeEntity($attachment);
         }
 
         if (empty($files)) {
@@ -179,6 +187,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $tmpFile = $tmpDir . DIRECTORY_SEPARATOR . $this->createFileName($importFeed->get('name'), 'csv');
 
         $this->combineCSVs($files, $tmpFile, $jobData['delimiter'], $jobData['enclosure']);
+        foreach ($convertedFiles as $convertedFile) {
+            $this->getEntityManager()->removeEntity($convertedFile);
+        }
 
         $input = new \stdClass();
         $input->name = $this->createFileName($importFeed->get('name'), 'csv');
@@ -186,12 +197,12 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $input->folderId = $this->getImportFeedService()->createImportFileFolder($importFeed)->get('id');
 
         $file = $this->getService('File')->moveLocalFileToFileEntity($input, $tmpFile);
+        $fileId = is_array($file) ? $file['id'] : $file->get('id');
 
-        if (is_array($file)) {
-            $file = $this->getEntityManager()->getEntity('File', $file['id']);
-        }
+        $importFeed->set('maxPerJob', $importFeed->getFeedField('httpLimit'));
+        $importFeed->setFeedField('format', 'CSV');
 
-        return $file;
+        $this->getImportFeedService()->pushJobs($importFeed, $fileId);
     }
 
     protected function createAttachment(string $name, string $contents, string $folderId): Entity
@@ -206,8 +217,12 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return is_array($fileData) ? $this->getEntityManager()->getRepository('File')->get($fileData['id']) : $fileData;
     }
 
-    protected function combineCSVs(array $files, string $outputFile, string $delimiter = ',', string $enclosure = '"'): void
-    {
+    protected function combineCSVs(
+        array $files,
+        string $outputFile,
+        string $delimiter = ',',
+        string $enclosure = '"'
+    ): void {
         // Collect all unique headers across all files
         $allHeaders = [];
         foreach ($files as $file) {
