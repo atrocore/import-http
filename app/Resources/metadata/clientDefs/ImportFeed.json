@@ -8,6 +8,19 @@
   },
   "dynamicLogic": {
     "fields": {
+      "mergeResponses": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      },
       "httpUrl": {
         "visible": {
           "conditionGroup": [
