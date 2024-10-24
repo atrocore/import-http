@@ -49,9 +49,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         }
 
         if (!empty($importFeed->getFeedField('mergeResponses'))) {
-            $this->createCombinedJob($importFeed, $data);
-
-            return true;
+            return $this->createCombinedJob($importFeed, $data);
         }
 
         foreach ($data as $item) {
@@ -154,7 +152,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->createAttachment($attachmentName, $response->getOutput(), $folder->get('id'));
     }
 
-    protected function createCombinedJob(ImportFeed $importFeed, array $data): void
+    protected function createCombinedJob(ImportFeed $importFeed, array $data): bool
     {
         $format = $importFeed->getFeedField('format');
         if (!in_array($format, ['JSON', 'XML'])) {
@@ -221,6 +219,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $payload->format = 'CSV';
 
         $this->getImportFeedService()->pushJobs($importFeed, $fileId, $payload);
+
+        return true;
     }
 
     protected function createAttachment(string $name, string $contents, string $folderId): Entity
