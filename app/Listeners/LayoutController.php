@@ -41,6 +41,7 @@ class LayoutController extends AbstractListener
         $result[1]['rows'][] = [['name' => 'httpMethod'], ['name' => 'httpConnectionId']];
         $result[1]['rows'][] = [['name' => 'httpUrl', 'fullWidth' => true]];
         $result[1]['rows'][] = [['name' => 'httpBody', 'fullWidth' => true]];
+        $result[1]['rows'][] = [['name' => 'mergeResponses'], false];
 
         $event->setArgument('result', Json::encode($result));
     }

@@ -24,7 +24,6 @@ use Atro\Core\Utils\Util;
 use Espo\ORM\Entity;
 use Atro\Services\QueueManagerBase;
 use Import\Entities\ImportFeed;
-use Import\Services\ImportTypeSimple;
 use Import\Services\ImportFeed as ImportFeedService;
 
 class ImportTypeHttpJobCreator extends QueueManagerBase
@@ -38,9 +37,19 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $data = json_decode(json_encode($data), true);
 
-        $combine = true;
-        if ($combine) {
-            $this->createCombinedJob($data);
+        $importFeedId = $data[0]['importFeedId'] ?? null;
+        if (empty($importFeedId)) {
+            throw new BadRequest('ImportFeedId is required.');
+        }
+
+        /** @var ImportFeed $importFeed */
+        $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
+        if (empty($importFeed)) {
+            throw new BadRequest("ImportFeed $importFeedId not found.");
+        }
+
+        if (!empty($importFeed->getFeedField('mergeResponses'))) {
+            $this->createCombinedJob($importFeed, $data);
 
             return true;
         }
@@ -148,19 +157,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->createAttachment($attachmentName, $response->getOutput(), $folder->get('id'));
     }
 
-    protected function createCombinedJob(array $data): void
+    protected function createCombinedJob(ImportFeed $importFeed, array $data): void
     {
-        $importFeedId = $data[0]['importFeedId'] ?? null;
-        if (empty($importFeedId)) {
-            throw new BadRequest('Creating combined file failed. $importFeedId is empty.');
-        }
-
-        /** @var ImportFeed $importFeed */
-        $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
-        if (empty($importFeed)) {
-            throw new BadRequest("Creating combined file failed. ImportFeed $importFeedId not found.");
-        }
-
         $format = $importFeed->getFeedField('format');
         if (!in_array($format, ['JSON', 'XML'])) {
             throw new Error('Combined job possible only with JSON or XML format.');
