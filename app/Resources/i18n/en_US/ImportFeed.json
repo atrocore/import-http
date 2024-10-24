@@ -1,5 +1,6 @@
 {
   "fields": {
+    "mergeResponses": "Merge responses",
     "httpOffset": "Request Offset",
     "httpLimit": "Request Limit",
     "httpTotal": "Total Request Records",
@@ -25,5 +26,8 @@
   },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL or Request Body cannot be formed, please check your parameters for Offset, Limit and Total records."
+  },
+  "tooltips": {
+    "mergeResponses": "Once downloaded, all responses are merged before starting processing. Processing is performed in a single Import Job."
   }
 }

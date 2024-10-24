@@ -10,6 +10,13 @@
         "http"
       ]
     },
+    "mergeResponses": {
+      "type": "bool",
+      "default": false,
+      "notStorable": true,
+      "dataField": true,
+      "tooltip": true
+    },
     "httpMethod": {
       "type": "enum",
       "optionsIds": [

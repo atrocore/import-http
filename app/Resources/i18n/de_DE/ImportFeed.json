@@ -1,5 +1,6 @@
 {
   "fields": {
+    "mergeResponses": "Antworten zusammenführen",
     "importHttpHeaders": "Headers",
     "httpConnectionName": "Name der Verbindung"
   },
@@ -18,5 +19,8 @@
   },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL oder Request Body kann nicht gebildet werden, bitte überprüfen Sie Ihre Parameter für Offset, Limit und Total Records."
+  },
+  "tooltips": {
+    "mergeResponses": "Nach dem Herunterladen werden alle Antworten zusammengeführt, bevor die Verarbeitung beginnt. Die Verarbeitung erfolgt in einem einzigen Importauftrag."
   }
 }
