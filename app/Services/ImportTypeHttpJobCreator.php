@@ -18,6 +18,7 @@ use Atro\ConnectionType\HttpConnectionInterface;
 use Atro\Core\EventManager\Event;
 use Atro\Core\EventManager\Manager;
 use Atro\Core\Exceptions\BadRequest;
+use Atro\Core\Exceptions\Error;
 use Espo\Core\Utils\Metadata;
 use Atro\Core\Utils\Util;
 use Espo\ORM\Entity;
@@ -160,36 +161,53 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             throw new BadRequest("Creating combined file failed. ImportFeed $importFeedId not found.");
         }
 
-        $convertedFiles = [];
+        $format = $importFeed->getFeedField('format');
+        if (!in_array($format, ['JSON', 'XML'])) {
+            throw new Error('Combined job possible only with JSON or XML format.');
+        }
+
+        $tmpDir = ImportFeedService::TMP_DIR . DIRECTORY_SEPARATOR . Util::generateId();
+        @mkdir($tmpDir, 0777, true);
+
+        $delimiter = ",";
+        $enclosure = '"';
+
         $files = [];
         foreach ($data as $v) {
-            /** @var ImportTypeSimple $service */
-            $service = $this->getService('ImportTypeSimple');
-            try {
-                $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
-                $jobData = $service->prepareJobData($importFeed, $attachment->get('id'));
-                $convertedFile = $service->createConvertedFile($importFeed, $jobData);
-            } catch (\Throwable $e) {
+            $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
+
+            $fileParser = $this->getFileParser($format);
+            $fileParser->setData([
+                'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
+                'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? []
+            ]);
+
+            $parsedData = $fileParser->getFileData($attachment);
+
+            $fileParser = $this->getFileParser('CSV');
+            $fileParser->setData([
+                'delimiter' => $delimiter,
+                'enclosure' => $enclosure
+            ]);
+
+            $contents = $fileParser->createFileContent($parsedData);
+            if (empty($contents) || $contents === "\n\n") {
                 continue;
             }
-            $convertedFiles[] = $convertedFile;
-            $files[] = $convertedFile->getFilePath();
+
+            $fileName = $tmpDir . DIRECTORY_SEPARATOR . Util::generateId() . '.csv';
+            file_put_contents($fileName, $contents);
             $this->getEntityManager()->removeEntity($attachment);
+            $files[] = $fileName;
         }
 
         if (empty($files)) {
             throw new BadRequest('Creating combined file failed.');
         }
 
-        $tmpDir = ImportFeedService::TMP_DIR . DIRECTORY_SEPARATOR . Util::generateId();
-        @mkdir($tmpDir, 0777, true);
-
         $tmpFile = $tmpDir . DIRECTORY_SEPARATOR . $this->createFileName($importFeed->get('name'), 'csv');
 
-        $this->combineCSVs($files, $tmpFile, $jobData['delimiter'], $jobData['enclosure']);
-        foreach ($convertedFiles as $convertedFile) {
-            $this->getEntityManager()->removeEntity($convertedFile);
-        }
+        $this->combineCSVs($files, $tmpFile, $delimiter, $enclosure);
 
         $input = new \stdClass();
         $input->name = $this->createFileName($importFeed->get('name'), 'csv');
@@ -198,6 +216,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $file = $this->getService('File')->moveLocalFileToFileEntity($input, $tmpFile);
         $fileId = is_array($file) ? $file['id'] : $file->get('id');
+
+        // delete all tmp files
+        Util::removeDir($tmpDir);
 
         $importFeed->set('maxPerJob', $importFeed->getFeedField('httpLimit'));
         $importFeed->setFeedField('format', 'CSV');
@@ -274,6 +295,11 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         }
 
         return $this->importFeedService;
+    }
+
+    protected function getFileParser(string $format): \Import\FileParsers\FileParserInterface
+    {
+        return $this->getContainer()->get(ImportFeed::getFileParserClass($format));
     }
 
     protected function getMetadata(): Metadata
