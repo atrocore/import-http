@@ -220,10 +220,13 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         // delete all tmp files
         Util::removeDir($tmpDir);
 
-        $importFeed->set('maxPerJob', $importFeed->getFeedField('httpLimit'));
-        $importFeed->setFeedField('format', 'CSV');
+        $payload = new \stdClass();
+        $payload->delimiter = $delimiter;
+        $payload->enclosure = $enclosure;
+        $payload->format = 'CSV';
+        $payload->maxPerJob = $importFeed->getFeedField('httpLimit');
 
-        $this->getImportFeedService()->pushJobs($importFeed, $fileId);
+        $this->getImportFeedService()->pushJobs($importFeed, $fileId, $payload);
     }
 
     protected function createAttachment(string $name, string $contents, string $folderId): Entity
