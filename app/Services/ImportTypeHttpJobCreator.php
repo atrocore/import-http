@@ -57,7 +57,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         foreach ($data as $item) {
             $payload = !empty($item['payload']) ? json_decode(json_encode($item['payload'])) : new \stdClass();
             try {
-                $this->createJobs($item['importFeedId'], $item['httpUrl'], (string)$item['httpBody'], $payload);
+                $this->createJobs($importFeed, $item['httpUrl'], (string)$item['httpBody'], $payload);
             } catch (\Throwable $e) {
                 $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
             }
@@ -71,14 +71,11 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
-    public function createJobs(string $importFeedId, string $httpUrl, string $httpBody, \stdClass $payload): void
+    public function createJobs(ImportFeed $importFeed, string $httpUrl, string $httpBody, \stdClass $payload): void
     {
         if (empty($httpUrl)) {
             throw new BadRequest('Validation failed. URL is required.');
         }
-
-        /** @var ImportFeed $importFeed */
-        $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
 
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
@@ -222,7 +219,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $payload->delimiter = $delimiter;
         $payload->enclosure = $enclosure;
         $payload->format = 'CSV';
-        $payload->maxPerJob = $importFeed->getFeedField('httpLimit');
 
         $this->getImportFeedService()->pushJobs($importFeed, $fileId, $payload);
     }
