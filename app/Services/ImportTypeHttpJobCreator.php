@@ -142,7 +142,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             }
         }
 
-        $attachmentName = $this->createFileName($importFeed->get('name') . '_' . Util::generateId(), $ext);
+        $attachmentName = $this->createFileName($importFeed->get('name'), $ext);
 
         $response = $this
             ->createConnection($importFeed->getFeedField('httpConnectionId') ?? null)
