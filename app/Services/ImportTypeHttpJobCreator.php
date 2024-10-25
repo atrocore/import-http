@@ -171,6 +171,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
             $fileParser = $this->getFileParser($format);
             $fileParser->setData([
+                'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
                 'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
                 'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
                 'emptyValue'      => $importFeed->getFeedField('emptyValue'),
@@ -178,6 +179,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             ]);
 
             $parsedData = $fileParser->getFileData($attachment);
+            if (empty($parsedData)) {
+                continue;
+            }
 
             $fileParser = $this->getFileParser('CSV');
             $fileParser->setData([
