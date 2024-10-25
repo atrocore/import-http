@@ -162,7 +162,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $tmpDir = ImportFeedService::TMP_DIR . DIRECTORY_SEPARATOR . Util::generateId();
         @mkdir($tmpDir, 0777, true);
 
-        $delimiter = ",";
+        $delimiter = ";";
         $enclosure = '"';
 
         $files = [];
@@ -172,15 +172,17 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             $fileParser = $this->getFileParser($format);
             $fileParser->setData([
                 'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
-                'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? []
+                'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
+                'emptyValue'      => $importFeed->getFeedField('emptyValue'),
+                'nullValue'       => $importFeed->getFeedField('nullValue'),
             ]);
 
             $parsedData = $fileParser->getFileData($attachment);
 
             $fileParser = $this->getFileParser('CSV');
             $fileParser->setData([
-                'delimiter' => $delimiter,
-                'enclosure' => $enclosure
+                'delimiter'  => $delimiter,
+                'enclosure'  => $enclosure,
             ]);
 
             $contents = $fileParser->createFileContent($parsedData);
