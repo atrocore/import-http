@@ -219,6 +219,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $payload->delimiter = $delimiter;
         $payload->enclosure = $enclosure;
         $payload->format = 'CSV';
+        if (empty($importFeed->get('maxPerJob'))) {
+            $payload->maxPerJob = 50000;
+        }
 
         $this->getImportFeedService()->pushJobs($importFeed, $fileId, $payload);
 
