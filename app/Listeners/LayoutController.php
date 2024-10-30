@@ -50,7 +50,7 @@ class LayoutController extends AbstractListener
     {
         $result = Json::decode($event->getArgument('result'), true);
 
-        $result = array_merge([['name' => 'importHttpHeaders']], $result);
+        $result = array_merge([['name' => 'importHttpHeaders', 'canClose' => false]], $result);
 
         $event->setArgument('result', Json::encode($result));
     }
