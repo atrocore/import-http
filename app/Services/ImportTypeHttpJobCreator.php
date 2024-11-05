@@ -219,7 +219,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         // delete all tmp files
         Util::removeDir($tmpDir);
 
-        $payload = new \stdClass();
+        $payload = isset($data[0]['payload']) ? json_decode(json_encode($data[0]['payload'])) : new \stdClass();
         $payload->delimiter = $delimiter;
         $payload->enclosure = $enclosure;
         $payload->format = 'CSV';
