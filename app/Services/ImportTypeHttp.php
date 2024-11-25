@@ -111,7 +111,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
         $offset = (int)$importFeed->getFeedField('httpOffset');
         $limit = (int)$importFeed->getFeedField('httpLimit');
-        $total = (int)$importFeed->getFeedField('httpTotal');
+        $total = $importFeed->getFeedField('httpTotal');
         $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
         $httpBody = (string)$importFeed->getFeedField('httpBody');
         $data = ['payload' => $payload];
@@ -128,7 +128,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
         }
 
-        if ($this->containsVariable($allExtractedExp, 'total')) {
+        if ($this->containsVariable($allExtractedExp, 'total') && $total !== null) {
             if (empty($total)) {
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
