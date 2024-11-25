@@ -131,8 +131,12 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         }
 
         if ($this->containsVariable($allExtractedExp, 'offset')) {
-            if (empty($limit) || empty($total)) {
+            if (empty($limit) || ($total !== null && $total <= 0)) {
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
+            }
+
+            if ($total === null) {
+                $total = $limit;
             }
 
             $jobData = [];
