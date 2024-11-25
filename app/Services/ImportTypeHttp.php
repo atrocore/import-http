@@ -120,7 +120,6 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
             $data['limit'] = $limit;
-
         }
 
         if ($this->containsVariable($allExtractedExp, 'total') && $total !== null) {
