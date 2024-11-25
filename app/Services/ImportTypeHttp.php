@@ -81,8 +81,6 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
     public function runImport(ImportFeed $importFeed, string $attachmentId, \stdClass $payload = null): bool
     {
-        /** @var ImportTypeHttpJobCreator $jobCreator */
-        $jobCreator = $this->getService('ImportTypeHttpJobCreator');
         /** @var \Import\Services\ImportFeed $service */
         $service = $this->getService('ImportFeed');
 
@@ -96,7 +94,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                     $payload->parentJobId = $parentJob->get('id');
                 }
 
-                $jobCreator->createJob($importFeed, $attachment, $payload);
+                $this->getImportTypeHttpJobCreator()->createJob($importFeed, $attachment, $payload);
             }
             return true;
         }
@@ -150,7 +148,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             }
 
             if (!empty($payload) && !empty($payload->executeNow)) {
-                $this->getService('ImportTypeHttpJobCreator')->run($jobData);
+                $this->getImportTypeHttpJobCreator()->run($jobData);
             } else {
                 $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
             }
@@ -173,7 +171,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
             if ($pages == 1) {
                 $data['page'] = $page;
-                $jobCreator->run([
+                $this->getImportTypeHttpJobCreator()->run([
                     [
                         'importFeedId' => $importFeed->get('id'),
                         'payload'      => $payload,
@@ -200,7 +198,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 }
 
                 if (!empty($payload) && !empty($payload->executeNow)) {
-                    $this->getService('ImportTypeHttpJobCreator')->run($jobData);
+                    $this->getImportTypeHttpJobCreator()->run($jobData);
                 } else {
                     $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
                 }
@@ -209,7 +207,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             }
         }
 
-        $jobCreator->run([
+        $this->getImportTypeHttpJobCreator()->run([
             [
                 'importFeedId' => $importFeed->get('id'),
                 'payload'      => $payload,
