@@ -39,8 +39,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             throw new BadRequest("Import Feed with ID '{$input->importFeedId}' does not exists.");
         }
 
-        /** @var HttpConnectionInterface $connectionType */
-        $connectionType = $this->getService('ImportTypeHttpJobCreator')->createConnection($importFeed->get('httpConnectionId'));
+        $connectionType = $this->getImportTypeHttpJobCreator()->createConnection($importFeed->get('httpConnectionId'));
 
         return ['url' => $connectionType->generateUrlForEntity($importFeed->get('entity'))];
     }
@@ -59,9 +58,7 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         $httpUrl = $this->getContainer()->get('twig')
             ->renderTemplate((string)$importFeed->get('httpUrl'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
 
-        $attachment = $this
-            ->getService('ImportTypeHttpJobCreator')
-            ->createAttachmentViaHttpRequest($importFeed, $httpUrl, '');
+        $attachment = $this->getImportTypeHttpJobCreator()->createAttachmentViaHttpRequest($importFeed, $httpUrl, '');
 
         $payload = new \stdClass();
         $payload->attachmentId = $attachment->get('id');
@@ -222,6 +219,11 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         ]);
 
         return true;
+    }
+
+    protected function getImportTypeHttpJobCreator(): ImportTypeHttpJobCreator
+    {
+        return $this->getService('ImportTypeHttpJobCreator');
     }
 
     private function containsVariable(array $allExtractedExp, string $string): bool
