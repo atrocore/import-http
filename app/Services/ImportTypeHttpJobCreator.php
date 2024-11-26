@@ -37,17 +37,16 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $GLOBALS['skipAssignmentNotifications'] = true;
         $GLOBALS['skipHooks'] = true;
 
-        $data = json_decode(json_encode($data), true);
+        $data = @json_decode(json_encode($data), true);
 
-        $importFeedId = $data['importFeedId'] ?? null;
-        if (empty($importFeedId)) {
+        if (empty($data['importFeedId'])) {
             throw new BadRequest('ImportFeedId is required.');
         }
 
         /** @var ImportFeed $importFeed */
-        $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
+        $importFeed = $this->getImportFeedService()->getEntity($data['importFeedId']);
         if (empty($importFeed)) {
-            throw new BadRequest("ImportFeed $importFeedId not found.");
+            throw new BadRequest("ImportFeed {$data['importFeedId']} not found.");
         }
 
         $jobsData = $this->prepareJobsdata($importFeed, $data);
@@ -57,7 +56,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         }
 
         foreach ($jobsData as $item) {
-            $payload = !empty($item['payload']) ? json_decode(json_encode($item['payload'])) : new \stdClass();
+            $payload = !empty($item['payload']) ? @json_decode(json_encode($item['payload'])) : new \stdClass();
             try {
                 if (!empty($item['attachmentId'])) {
                     $this->createJobsForAttachment($importFeed, $item['attachmentId'], $payload);
@@ -325,16 +324,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                 $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
             }
 
-            $fileParser = $this->getFileParser($format);
-            $fileParser->setData([
-                'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
-                'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
-                'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
-                'emptyValue'      => $importFeed->getFeedField('emptyValue'),
-                'nullValue'       => $importFeed->getFeedField('nullValue'),
-            ]);
-
-            $parsedData = $fileParser->getFileData($attachment);
+            $parsedData = $this->parseImportFeedFile($importFeed, $attachment);
             if (empty($parsedData)) {
                 continue;
             }
