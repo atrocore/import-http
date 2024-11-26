@@ -99,147 +99,18 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
             return true;
         }
 
-        /** @var QueueManager $queueManager */
-        $queueManager = $this->getContainer()->get('queueManager');
-        /** @var Twig $twig */
-        $twig = $this->getContainer()->get('twig');
+        $jobData = [
+            'importFeedId' => $importFeed->get('id'),
+            'payload'      => $payload
+        ];
 
-        $offset = (int)$importFeed->getFeedField('httpOffset');
-        $limit = (int)$importFeed->getFeedField('httpLimit');
-        $total = $importFeed->getFeedField('httpTotal');
-        $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
-        $httpBody = (string)$importFeed->getFeedField('httpBody');
-        $data = ['payload' => $payload];
-
-        preg_match_all('/\{\{(.*?)}}/m', $httpUrl, $httpUrlExtractedExp, PREG_SET_ORDER, 0);
-        preg_match_all('/\{\{(.*?)}}/m', $httpBody, $httpBodyExtractedExp, PREG_SET_ORDER, 0);
-        $allExtractedExp = array_merge($httpUrlExtractedExp, $httpBodyExtractedExp);
-
-        if ($this->containsVariable($allExtractedExp, 'limit')) {
-            if (empty($limit)) {
-                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
-            }
-            $data['limit'] = $limit;
+        if (!empty($payload) && !empty($payload->executeNow)) {
+            $this->getImportTypeHttpJobCreator()->run($jobData);
+        } else {
+            /** @var QueueManager $queueManager */
+            $queueManager = $this->getContainer()->get('queueManager');
+            $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
         }
-
-        if ($this->containsVariable($allExtractedExp, 'total') && $total !== null) {
-            if (empty($total)) {
-                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
-            }
-            $data['total'] = $total;
-        }
-
-        if ($this->containsVariable($allExtractedExp, 'offset')) {
-            if (empty($limit) || ($total !== null && $total <= 0)) {
-                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
-            }
-
-            $jobData = [];
-
-            if ($total === null) {
-                while (true) {
-                    $data['offset'] = $offset;
-                    $preparedUrl = $twig->renderTemplate($httpUrl, $data);
-                    $preparedBody = $twig->renderTemplate($httpBody, $data);
-
-                    $attachment = $this
-                        ->getImportTypeHttpJobCreator()
-                        ->createAttachmentViaHttpRequest($importFeed, $preparedUrl, $preparedBody);
-
-                    $jobData[] = [
-                        'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
-                        'attachmentId' => $attachment->get('id')
-                    ];
-
-                    $offset = $offset + $limit;
-
-                    // @todo prepare exit
-                    if ($offset > 6) {
-                        break;
-                    }
-                }
-            } else {
-                while ($offset < $total) {
-                    $data['offset'] = $offset;
-                    $jobData[] = [
-                        'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
-                        'httpUrl'      => $twig->renderTemplate($httpUrl, $data),
-                        'httpBody'     => $twig->renderTemplate($httpBody, $data)
-                    ];
-                    $offset = $offset + $limit;
-                }
-            }
-
-            if (!empty($payload) && !empty($payload->executeNow)) {
-                $this->getImportTypeHttpJobCreator()->run($jobData);
-            } else {
-                $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
-            }
-
-            return true;
-        }
-
-        if ($this->containsVariable($allExtractedExp, 'page')) {
-            if (empty($limit) || empty($total)) {
-                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
-            }
-
-            $pages = ceil(($total - $offset) / $limit);
-
-            if ($pages < 1) {
-                $pages = 1;
-            }
-
-            $page = $offset > 0 ? ceil($offset / $limit) : 1;
-
-            if ($pages == 1) {
-                $data['page'] = $page;
-                $this->getImportTypeHttpJobCreator()->run([
-                    [
-                        'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
-                        'httpUrl'      => $twig->renderTemplate($httpUrl, $data),
-                        'httpBody'     => $twig->renderTemplate($httpBody, $data)
-                    ]
-                ]);
-
-                return true;
-            } else {
-                $jobData = [];
-                $i = 1;
-                while ($i <= $pages) {
-                    $data['page'] = $page;
-                    $jobData[] = [
-                        'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
-                        'httpUrl'      => $twig->renderTemplate($httpUrl, $data),
-                        'httpBody'     => $twig->renderTemplate($httpBody, $data)
-                    ];
-
-                    $i++;
-                    $page++;
-                }
-
-                if (!empty($payload) && !empty($payload->executeNow)) {
-                    $this->getImportTypeHttpJobCreator()->run($jobData);
-                } else {
-                    $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
-                }
-
-                return true;
-            }
-        }
-
-        $this->getImportTypeHttpJobCreator()->run([
-            [
-                'importFeedId' => $importFeed->get('id'),
-                'payload'      => $payload,
-                'httpUrl'      => $httpUrl,
-                'httpBody'     => $httpBody
-            ]
-        ]);
 
         return true;
     }
