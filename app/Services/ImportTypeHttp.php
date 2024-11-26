@@ -119,14 +119,4 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
     {
         return $this->getService('ImportTypeHttpJobCreator');
     }
-
-    private function containsVariable(array $allExtractedExp, string $string): bool
-    {
-        foreach ($allExtractedExp as $exp) {
-            if (strpos($exp[1], $string) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
