@@ -134,20 +134,42 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
 
-            if ($total === null) {
-                $total = $limit;
-            }
-
             $jobData = [];
-            while ($offset < $total) {
-                $data['offset'] = $offset;
-                $jobData[] = [
-                    'importFeedId' => $importFeed->get('id'),
-                    'payload'      => $payload,
-                    'httpUrl'      => $twig->renderTemplate($httpUrl, $data),
-                    'httpBody'     => $twig->renderTemplate($httpBody, $data)
-                ];
-                $offset = $offset + $limit;
+
+            if ($total === null) {
+                while (true) {
+                    $data['offset'] = $offset;
+                    $preparedUrl = $twig->renderTemplate($httpUrl, $data);
+                    $preparedBody = $twig->renderTemplate($httpBody, $data);
+
+                    $attachment = $this
+                        ->getImportTypeHttpJobCreator()
+                        ->createAttachmentViaHttpRequest($importFeed, $preparedUrl, $preparedBody);
+
+                    $jobData[] = [
+                        'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
+                        'attachmentId' => $attachment->get('id')
+                    ];
+
+                    $offset = $offset + $limit;
+
+                    // @todo prepare exit
+                    if ($offset > 6) {
+                        break;
+                    }
+                }
+            } else {
+                while ($offset < $total) {
+                    $data['offset'] = $offset;
+                    $jobData[] = [
+                        'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
+                        'httpUrl'      => $twig->renderTemplate($httpUrl, $data),
+                        'httpBody'     => $twig->renderTemplate($httpBody, $data)
+                    ];
+                    $offset = $offset + $limit;
+                }
             }
 
             if (!empty($payload) && !empty($payload->executeNow)) {

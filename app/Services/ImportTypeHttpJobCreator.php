@@ -55,7 +55,11 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         foreach ($data as $item) {
             $payload = !empty($item['payload']) ? json_decode(json_encode($item['payload'])) : new \stdClass();
             try {
-                $this->createJobs($importFeed, $item['httpUrl'], (string)$item['httpBody'], $payload);
+                if (!empty($item['attachmentId'])) {
+                    $this->createJobsForAttachment($importFeed, $item['attachmentId'], $payload);
+                } else {
+                    $this->createJobs($importFeed, $item['httpUrl'], (string)$item['httpBody'], $payload);
+                }
             } catch (\Throwable $e) {
                 $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
             }
@@ -69,6 +73,18 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
+    public function createJobsForAttachment(ImportFeed $importFeed, string $attachmentId, \stdClass $payload): void
+    {
+        $attachment = $this->getEntityManager()->getRepository('File')->get($attachmentId);
+
+        if ($this->getImportFeedService()->hasParentJob($importFeed)) {
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $payload->parentJobId = $parentJob->get('id');
+        }
+
+        $this->createJob($importFeed, $attachment, $payload);
+    }
+
     public function createJobs(ImportFeed $importFeed, string $httpUrl, string $httpBody, \stdClass $payload): void
     {
         if (empty($httpUrl)) {
@@ -78,8 +94,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
         if ($this->getImportFeedService()->hasParentJob($importFeed)) {
-            $parentJob = $this->getImportFeedService()->createImportJob($importFeed,
-                $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }
 
@@ -167,7 +182,11 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $files = [];
         foreach ($data as $v) {
-            $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
+            if (!empty($v['attachmentId'])) {
+                $attachment = $this->getEntityManager()->getRepository('File')->get($v['attachmentId']);
+            } else {
+                $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
+            }
 
             $fileParser = $this->getFileParser($format);
             $fileParser->setData([
