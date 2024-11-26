@@ -56,12 +56,14 @@
     },
     "httpOffset": {
       "type": "int",
+      "notNull": true,
       "notStorable": true,
       "dataField": true,
       "default": 0
     },
     "httpLimit": {
       "type": "int",
+      "notNull": true,
       "notStorable": true,
       "dataField": true,
       "default": 100
@@ -70,7 +72,7 @@
       "type": "int",
       "notStorable": true,
       "dataField": true,
-      "default": 2000
+      "default": null
     },
     "httpConnectionId": {
       "type": "varchar",

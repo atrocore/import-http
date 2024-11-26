@@ -19,6 +19,8 @@ use Atro\Core\EventManager\Event;
 use Atro\Core\EventManager\Manager;
 use Atro\Core\Exceptions\BadRequest;
 use Atro\Core\Exceptions\Error;
+use Atro\Core\Twig\Twig;
+use Atro\Entities\File;
 use Espo\Core\Utils\Metadata;
 use Atro\Core\Utils\Util;
 use Espo\ORM\Entity;
@@ -35,27 +37,32 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $GLOBALS['skipAssignmentNotifications'] = true;
         $GLOBALS['skipHooks'] = true;
 
-        $data = json_decode(json_encode($data), true);
+        $data = @json_decode(json_encode($data), true);
 
-        $importFeedId = $data[0]['importFeedId'] ?? null;
-        if (empty($importFeedId)) {
+        if (empty($data['importFeedId'])) {
             throw new BadRequest('ImportFeedId is required.');
         }
 
         /** @var ImportFeed $importFeed */
-        $importFeed = $this->getImportFeedService()->getEntity($importFeedId);
+        $importFeed = $this->getImportFeedService()->getEntity($data['importFeedId']);
         if (empty($importFeed)) {
-            throw new BadRequest("ImportFeed $importFeedId not found.");
+            throw new BadRequest("ImportFeed {$data['importFeedId']} not found.");
         }
+
+        $jobsData = $this->prepareJobsdata($importFeed, $data);
 
         if (!empty($importFeed->getFeedField('mergeResponses'))) {
-            return $this->createCombinedJob($importFeed, $data);
+            return $this->createCombinedJob($importFeed, $jobsData);
         }
 
-        foreach ($data as $item) {
-            $payload = !empty($item['payload']) ? json_decode(json_encode($item['payload'])) : new \stdClass();
+        foreach ($jobsData as $item) {
+            $payload = !empty($item['payload']) ? @json_decode(json_encode($item['payload'])) : new \stdClass();
             try {
-                $this->createJobs($importFeed, $item['httpUrl'], (string)$item['httpBody'], $payload);
+                if (!empty($item['attachmentId'])) {
+                    $this->createJobsForAttachment($importFeed, $item['attachmentId'], $payload);
+                } else {
+                    $this->createJobs($importFeed, $item['httpUrl'], (string)$item['httpBody'], $payload);
+                }
             } catch (\Throwable $e) {
                 $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
             }
@@ -69,6 +76,153 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return '';
     }
 
+    protected function prepareJobsData(ImportFeed $importFeed, array $data): array
+    {
+        $res = [];
+
+        $payload = $data['payload'] ?? null;
+        $data['offset'] = $offset = (int)$importFeed->getFeedField('httpOffset');
+        $data['limit'] = $limit = (int)$importFeed->getFeedField('httpLimit');
+        $data['total'] = $total = $importFeed->getFeedField('httpTotal');
+        $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
+        $httpBody = (string)$importFeed->getFeedField('httpBody');
+
+        preg_match_all('/\{\{(.*?)}}/m', $httpUrl, $httpUrlExtractedExp, PREG_SET_ORDER, 0);
+        preg_match_all('/\{\{(.*?)}}/m', $httpBody, $httpBodyExtractedExp, PREG_SET_ORDER, 0);
+        $allExtractedExp = array_merge($httpUrlExtractedExp, $httpBodyExtractedExp);
+
+        if ($this->containsVariable($allExtractedExp, 'offset')) {
+            if ($total === null) {
+                $iteration = 0;
+                while (true) {
+                    if ($iteration > 2000) {
+                        // stop if too many iterations. maybe something wrong
+                        break;
+                    }
+
+                    $data['offset'] = $offset;
+                    try {
+                        $attachment = $this->createAttachmentViaHttpRequest(
+                            $importFeed,
+                            $this->twig()->renderTemplate($httpUrl, $data),
+                            $this->twig()->renderTemplate($httpBody, $data)
+                        );
+                    } catch (\Throwable $e) {
+                        break;
+                    }
+
+                    $res[] = [
+                        'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
+                        'attachmentId' => $attachment->get('id')
+                    ];
+
+                    $parsedData = $this->parseImportFeedFile($importFeed, $attachment);
+                    if (empty($parsedData)) {
+                        // stop because no results
+                        break;
+                    } else {
+                        $identifiers = $this->getEntityManager()->getRepository('ImportConfiguratorItem')
+                            ->where([
+                                'importFeedId'     => $importFeed->get('id'),
+                                'entityIdentifier' => true
+                            ])
+                            ->find();
+                        foreach ($identifiers as $identifier) {
+                            if (!empty($identifier->get('column')[0])) {
+                                foreach ($parsedData as $row) {
+                                    if (!array_key_exists($identifier->get('column')[0], $row)) {
+                                        // stop because not identifier
+                                        break 3;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $offset = $offset + $limit;
+                    $iteration++;
+                }
+            } else {
+                while ($offset < $total) {
+                    $data['offset'] = $offset;
+                    $res[] = [
+                        'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
+                        'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
+                        'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
+                    ];
+                    $offset = $offset + $limit;
+                }
+            }
+        }
+
+        if ($this->containsVariable($allExtractedExp, 'page')) {
+            if (empty($limit) || empty($total)) {
+                throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
+            }
+
+            // @todo if total is null we need to import all. same as for offset and limit
+
+            $pages = ceil(($total - $offset) / $limit);
+
+            if ($pages < 1) {
+                $pages = 1;
+            }
+
+            $page = $offset > 0 ? ceil($offset / $limit) : 1;
+
+            if ($pages == 1) {
+                $data['page'] = $page;
+                $res[] = [
+                    [
+                        'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
+                        'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
+                        'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
+                    ]
+                ];
+            } else {
+                $i = 1;
+                while ($i <= $pages) {
+                    $data['page'] = $page;
+                    $res[] = [
+                        'importFeedId' => $importFeed->get('id'),
+                        'payload'      => $payload,
+                        'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
+                        'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
+                    ];
+
+                    $i++;
+                    $page++;
+                }
+            }
+        }
+
+        if (empty($res)) {
+            $res[] = [
+                'importFeedId' => $importFeed->get('id'),
+                'payload'      => $payload,
+                'httpUrl'      => $httpUrl,
+                'httpBody'     => $httpBody
+            ];
+        }
+
+        return $res;
+    }
+
+    public function createJobsForAttachment(ImportFeed $importFeed, string $attachmentId, \stdClass $payload): void
+    {
+        $attachment = $this->getEntityManager()->getRepository('File')->get($attachmentId);
+
+        if ($this->getImportFeedService()->hasParentJob($importFeed)) {
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $payload->parentJobId = $parentJob->get('id');
+        }
+
+        $this->createJob($importFeed, $attachment, $payload);
+    }
+
     public function createJobs(ImportFeed $importFeed, string $httpUrl, string $httpBody, \stdClass $payload): void
     {
         if (empty($httpUrl)) {
@@ -78,8 +232,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
         if ($this->getImportFeedService()->hasParentJob($importFeed)) {
-            $parentJob = $this->getImportFeedService()->createImportJob($importFeed,
-                $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }
 
@@ -105,7 +258,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                 new Event(['importFeedId' => $importFeed->get('id')]));
     }
 
-    public function createAttachmentViaHttpRequest(Entity $importFeed, string $httpUrl, string $httpBody): Entity
+    public function createAttachmentViaHttpRequest(Entity $importFeed, string $httpUrl, string $httpBody): File
     {
         $httpMethod = $importFeed->getFeedField('httpMethod');
         $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
@@ -167,18 +320,13 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         $files = [];
         foreach ($data as $v) {
-            $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
+            if (!empty($v['attachmentId'])) {
+                $attachment = $this->getEntityManager()->getRepository('File')->get($v['attachmentId']);
+            } else {
+                $attachment = $this->createAttachmentViaHttpRequest($importFeed, $v['httpUrl'], (string)$v['httpBody']);
+            }
 
-            $fileParser = $this->getFileParser($format);
-            $fileParser->setData([
-                'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
-                'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
-                'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
-                'emptyValue'      => $importFeed->getFeedField('emptyValue'),
-                'nullValue'       => $importFeed->getFeedField('nullValue'),
-            ]);
-
-            $parsedData = $fileParser->getFileData($attachment);
+            $parsedData = $this->parseImportFeedFile($importFeed, $attachment);
             if (empty($parsedData)) {
                 continue;
             }
@@ -232,7 +380,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return true;
     }
 
-    protected function createAttachment(string $name, string $contents, string $folderId): Entity
+    protected function createAttachment(string $name, string $contents, string $folderId): File
     {
         $input = new \stdClass();
         $input->name = $name;
@@ -318,9 +466,38 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         return $this->getContainer()->get('eventManager');
     }
 
+    protected function twig(): Twig
+    {
+        return $this->getContainer()->get('twig');
+    }
+
     protected function createFileName(string $str, string $ext): string
     {
         return preg_replace('/[^a-z0-9_]/', '', str_replace(' ', '_', strtolower($str))) . '.' . $ext;
+    }
+
+    protected function containsVariable(array $allExtractedExp, string $string): bool
+    {
+        foreach ($allExtractedExp as $exp) {
+            if (strpos($exp[1], $string) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function parseImportFeedFile(ImportFeed $importFeed, File $file): array
+    {
+        $fileParser = $this->getFileParser($importFeed->getFeedField('format'));
+        $fileParser->setData([
+            'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
+            'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
+            'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
+            'emptyValue'      => $importFeed->getFeedField('emptyValue'),
+            'nullValue'       => $importFeed->getFeedField('nullValue'),
+        ]);
+
+        return $fileParser->getFileData($file);
     }
 
     public function createConnection(?string $httpConnectionId): HttpConnectionInterface
