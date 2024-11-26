@@ -93,9 +93,9 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
 
         if ($this->containsVariable($allExtractedExp, 'offset')) {
             if ($total === null) {
-                $i = 0;
+                $iteration = 0;
                 while (true) {
-                    if ($i > 2000) {
+                    if ($iteration > 2000) {
                         // stop if too many iterations. maybe something wrong
                         break;
                     }
@@ -141,7 +141,7 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                     }
 
                     $offset = $offset + $limit;
-                    $i++;
+                    $iteration++;
                 }
             } else {
                 while ($offset < $total) {
@@ -161,6 +161,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
             if (empty($limit) || empty($total)) {
                 throw new BadRequest($this->translate('urlOrBodyCannotBeFormed', 'exceptions', 'ImportFeed'));
             }
+
+            // @todo if total is null we need to import all. same as for offset and limit
 
             $pages = ceil(($total - $offset) / $limit);
 
