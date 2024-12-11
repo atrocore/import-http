@@ -11,23 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ImportHttp\Services;
+namespace ImportHttp\Jobs;
 
-use Atro\ConnectionType\HttpConnectionInterface;
-use Atro\Core\Twig\Twig;
-use Espo\Core\Exceptions\BadRequest;
-use Espo\Core\QueueManager;
-use Espo\ORM\Entity;
+use Atro\Core\Exceptions\BadRequest;
+use Atro\Jobs\JobInterface;
 use Import\Entities\ImportFeed;
 
-class ImportTypeHttp extends \Import\Services\ImportTypeSimple
+class ImportTypeHttp extends \Import\Jobs\ImportTypeSimple implements JobInterface
 {
-    public function getNotificationMessage(Entity $queueItem): string
-    {
-        // disable notifications, because for big count of jobs it looks like spam
-        return '';
-    }
-
     public function generateURL(\stdClass $input): array
     {
         if (empty($input->importFeedId)) {
@@ -107,9 +98,14 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
         if (!empty($payload) && !empty($payload->executeNow)) {
             $this->getImportTypeHttpJobCreator()->run($jobData);
         } else {
-            /** @var QueueManager $queueManager */
-            $queueManager = $this->getContainer()->get('queueManager');
-            $queueManager->push("Create Import Jobs for {$importFeed->get("name")}", 'ImportTypeHttpJobCreator', $jobData, 'High');
+            $job = $this->getEntityManager()->getEntity('Job');
+            $job->set([
+                'name'     => "Create Import Jobs for {$importFeed->get("name")}",
+                'type'     => 'ImportTypeHttpJobCreator',
+                'priority' => 150,
+                'payload'  => $jobData
+            ]);
+            $this->getEntityManager()->saveEntity($job);
         }
 
         return true;
@@ -117,6 +113,6 @@ class ImportTypeHttp extends \Import\Services\ImportTypeSimple
 
     protected function getImportTypeHttpJobCreator(): ImportTypeHttpJobCreator
     {
-        return $this->getService('ImportTypeHttpJobCreator');
+        return $this->getContainer()->get(ImportTypeHttpJobCreator::class);
     }
 }

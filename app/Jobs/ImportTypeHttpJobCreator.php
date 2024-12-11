@@ -11,33 +11,32 @@
 
 declare(strict_types=1);
 
-namespace ImportHttp\Services;
+namespace ImportHttp\Jobs;
 
 use Atro\ConnectionType\ConnectionHttp;
 use Atro\ConnectionType\HttpConnectionInterface;
 use Atro\Core\EventManager\Event;
-use Atro\Core\EventManager\Manager;
 use Atro\Core\Exceptions\BadRequest;
 use Atro\Core\Exceptions\Error;
-use Atro\Core\Twig\Twig;
 use Atro\Entities\File;
-use Espo\Core\Utils\Metadata;
+use Atro\Entities\Job;
+use Atro\Jobs\AbstractJob;
+use Atro\Jobs\JobInterface;
 use Atro\Core\Utils\Util;
 use Espo\ORM\Entity;
-use Atro\Services\QueueManagerBase;
 use Import\Entities\ImportFeed;
 use Import\Services\ImportFeed as ImportFeedService;
 
-class ImportTypeHttpJobCreator extends QueueManagerBase
+class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 {
     protected $importFeedService = null;
 
-    public function run(array $data = []): bool
+    public function run(Job $job): void
     {
         $GLOBALS['skipAssignmentNotifications'] = true;
         $GLOBALS['skipHooks'] = true;
 
-        $data = @json_decode(json_encode($data), true);
+        $data = $job->getPayload();
 
         if (empty($data['importFeedId'])) {
             throw new BadRequest('ImportFeedId is required.');
@@ -52,7 +51,8 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
         $jobsData = $this->prepareJobsdata($importFeed, $data);
 
         if (!empty($importFeed->getFeedField('mergeResponses'))) {
-            return $this->createCombinedJob($importFeed, $jobsData);
+            $this->createCombinedJob($importFeed, $jobsData);
+            return;
         }
 
         foreach ($jobsData as $item) {
@@ -67,13 +67,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
                 $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
             }
         }
-
-        return true;
-    }
-
-    public function getNotificationMessage(Entity $queueItem): string
-    {
-        return '';
     }
 
     protected function prepareJobsData(ImportFeed $importFeed, array $data): array
@@ -454,21 +447,6 @@ class ImportTypeHttpJobCreator extends QueueManagerBase
     protected function getFileParser(string $format): \Import\FileParsers\FileParserInterface
     {
         return $this->getContainer()->get(ImportFeed::getFileParserClass($format));
-    }
-
-    protected function getMetadata(): Metadata
-    {
-        return $this->getContainer()->get('metadata');
-    }
-
-    protected function getEventManager(): Manager
-    {
-        return $this->getContainer()->get('eventManager');
-    }
-
-    protected function twig(): Twig
-    {
-        return $this->getContainer()->get('twig');
     }
 
     protected function createFileName(string $str, string $ext): string

@@ -1,0 +1,10 @@
+{
+  "ImportTypeHttpJobCreator": {
+    "scheduledJob": false,
+    "handler": "\\ImportHttp\\Jobs\\ImportTypeHttpJobCreator"
+  },
+  "ImportTypeHttp": {
+    "scheduledJob": false,
+    "handler": "\\ImportHttp\\Jobs\\ImportTypeHttp"
+  }
+}
