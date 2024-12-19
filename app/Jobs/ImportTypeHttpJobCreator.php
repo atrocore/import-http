@@ -234,8 +234,8 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     public function createJob(ImportFeed $importFeed, Entity $attachment, \stdClass $payload): void
     {
-        $jobData = $this->getContainer()->get('serviceFactory')->create('ImportTypeHttp')->prepareJobData($importFeed,
-            $attachment->get('id'), true);
+        $jobData = $this->getContainer()->get(ImportTypeHttp::class)
+            ->prepareJobData($importFeed, $attachment->get('id'), true);
         $jobData['payload'] = $payload;
         $jobData['data']['importJobId'] = $this
             ->getImportFeedService()
