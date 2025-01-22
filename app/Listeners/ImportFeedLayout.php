@@ -14,13 +14,11 @@ declare(strict_types=1);
 namespace ImportHttp\Listeners;
 
 use Atro\Listeners\AbstractLayoutListener;
-use Espo\Core\Utils\Json;
-use Espo\Core\EventManager\Event;
-use Espo\Listeners\AbstractListener;
+use Atro\Core\EventManager\Event;
 
-class Layout extends AbstractLayoutListener
+class ImportFeedLayout extends AbstractLayoutListener
 {
-    protected function modifyImportFeedDetail(Event $event): void
+    protected function detail(Event $event): void
     {
         $result = $event->getArgument('result');
 
@@ -34,7 +32,7 @@ class Layout extends AbstractLayoutListener
         $event->setArgument('result',  $result);
     }
 
-    protected function modifyImportFeedRelationships(Event $event): void
+    protected function relationships(Event $event): void
     {
         $result = $event->getArgument('result');
 
