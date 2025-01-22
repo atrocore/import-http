@@ -18,7 +18,7 @@ use Atro\Core\EventManager\Event;
 
 class ImportFeedLayout extends AbstractLayoutListener
 {
-    protected function detail(Event $event): void
+    public function detail(Event $event): void
     {
         $result = $event->getArgument('result');
 
@@ -32,7 +32,7 @@ class ImportFeedLayout extends AbstractLayoutListener
         $event->setArgument('result',  $result);
     }
 
-    protected function relationships(Event $event): void
+    public function relationships(Event $event): void
     {
         $result = $event->getArgument('result');
 
