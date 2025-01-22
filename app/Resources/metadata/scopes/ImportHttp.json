@@ -10,5 +10,6 @@
   "stream": false,
   "disabled": false,
   "type": "Base",
-  "module": "ImportHttp"
+  "module": "ImportHttp",
+  "emHidden": true
 }
