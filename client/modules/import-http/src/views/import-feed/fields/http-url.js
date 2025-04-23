@@ -22,9 +22,9 @@ Espo.define('import-http:views/import-feed/fields/http-url', 'views/fields/scrip
             initMagicIcon() {
                 const $cell = this.getCellElement();
 
-                $cell.find('.fa-magic').parent().remove();
+                $cell.find('.ph-magic-wand').parent().remove();
 
-                const $link = $('<a href="javascript:" class="pull-right hidden generate-url" title="' + this.translate('generateURL', 'labels', 'ImportFeed') + '"><span class="fas fa-magic fa-sm"></span></a>');
+                const $link = $('<a href="javascript:" class="pull-right hidden generate-url" title="' + this.translate('generateURL', 'labels', 'ImportFeed') + '"><i class="ph ph-magic-wand"></i></a>');
 
                 $cell.prepend($link);
 
