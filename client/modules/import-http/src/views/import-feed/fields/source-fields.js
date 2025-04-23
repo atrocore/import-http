@@ -21,16 +21,21 @@ Espo.define('import-http:views/import-feed/fields/source-fields', 'import:views/
 
             initMagicIcon() {
                 const $cell = this.getCellElement();
+                const actions = this.getInlineActionsContainer();
 
-                $cell.find('.fa-magic').parent().remove();
+                $cell.find('.ph-magic-wand').parent().remove();
 
                 if (!this.model.get('httpUrl')) {
                     return;
                 }
 
-                const $link = $('<a href="javascript:" class="pull-right hidden generate-source-fields" title="' + this.translate('generateSourceFields', 'labels', 'ImportFeed') + '"><span class="fas fa-magic fa-sm"></span></a>');
+                const $link = $('<a href="javascript:" class="pull-right hidden generate-source-fields" title="' + this.translate('generateSourceFields', 'labels', 'ImportFeed') + '"><i class="ph ph-magic-wand"></i></a>');
 
-                $cell.prepend($link);
+                if (actions && actions.size() > 0) {
+                    actions.prepend($link);
+                } else {
+                    $cell.prepend($link);
+                }
 
                 $link.on('click', () => {
                     this.confirm({
