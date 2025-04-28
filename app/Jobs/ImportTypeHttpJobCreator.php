@@ -168,12 +168,10 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
             if ($pages == 1) {
                 $data['page'] = $page;
                 $res[] = [
-                    [
-                        'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
-                        'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
-                        'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
-                    ]
+                    'importFeedId' => $importFeed->get('id'),
+                    'payload'      => $payload,
+                    'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
+                    'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
                 ];
             } else {
                 $i = 1;
@@ -326,8 +324,8 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
             $fileParser = $this->getFileParser('CSV');
             $fileParser->setData([
-                'delimiter'  => $delimiter,
-                'enclosure'  => $enclosure,
+                'delimiter' => $delimiter,
+                'enclosure' => $enclosure,
             ]);
 
             $contents = $fileParser->createFileContent($parsedData);
@@ -386,11 +384,12 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
     }
 
     protected function combineCSVs(
-        array $files,
+        array  $files,
         string $outputFile,
         string $delimiter = ',',
         string $enclosure = '"'
-    ): void {
+    ): void
+    {
         // Collect all unique headers across all files
         $allHeaders = [];
         foreach ($files as $file) {
