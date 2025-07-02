@@ -17,6 +17,11 @@
               "value": [
                 "http"
               ]
+            },
+            {
+              "type": "equals",
+              "attribute": "processingType",
+              "value": "configurator"
             }
           ]
         }
