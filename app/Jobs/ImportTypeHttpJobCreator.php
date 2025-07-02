@@ -48,9 +48,12 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
             throw new BadRequest("ImportFeed {$data['importFeedId']} not found.");
         }
 
-        $jobsData = $this->prepareJobsdata($importFeed, $data);
+        $jobsData = $this->prepareJobsData($importFeed, $data);
 
-        if (!empty($importFeed->getFeedField('mergeResponses'))) {
+        if (
+            !empty($importFeed->getFeedField('mergeResponses'))
+            && $importFeed->get('processingType') === 'configurator'
+        ) {
             $this->createCombinedJob($importFeed, $jobsData);
             return;
         }
