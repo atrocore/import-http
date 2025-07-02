@@ -48,15 +48,30 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
             throw new BadRequest("ImportFeed {$data['importFeedId']} not found.");
         }
 
-        $jobsData = $this->prepareJobsdata($importFeed, $data);
+        $jobsData = $this->prepareJobsData($importFeed, $data);
 
         if (!empty($importFeed->getFeedField('mergeResponses'))) {
-            $this->createCombinedJob($importFeed, $jobsData);
-            return;
+            if ($importFeed->get('processingType') === 'configurator') {
+                $this->createCombinedJob($importFeed, $jobsData);
+                return;
+            } else {
+                $entityName = $importFeed->getFeedField('entity');
+                $entityLabel = $this->getLanguage()->translate($entityName, 'scopeNames');
+
+                $parentJob = $this->getEntityManager()->getEntity('ImportJob');
+                $parentJob->set('name', "{$entityLabel}: {$importFeed->get('name')}");
+                $parentJob->set('importFeedId', $importFeed->get('id'));
+                $parentJob->set('entityName', $entityName);
+                $parentJob->set('sortOrder', time() - (new \DateTime('2023-01-01'))->getTimestamp());
+                $this->getEntityManager()->saveEntity($parentJob);
+            }
         }
 
         foreach ($jobsData as $item) {
             $payload = !empty($item['payload']) ? @json_decode(json_encode($item['payload'])) : new \stdClass();
+            if (!empty($parentJob)) {
+                $payload->parentJobId = $parentJob->get('id');
+            }
             try {
                 if (!empty($item['attachmentId'])) {
                     $this->createJobsForAttachment($importFeed, $item['attachmentId'], $payload);
@@ -222,7 +237,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
-        if ($this->getImportFeedService()->hasParentJob($importFeed)) {
+        if ($this->getImportFeedService()->hasParentJob($importFeed) && empty($payload->parentJobId)) {
             $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }

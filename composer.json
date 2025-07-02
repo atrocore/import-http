@@ -2,8 +2,8 @@
   "name": "atrocore/import-http",
   "default": "",
   "require": {
-    "atrocore/core": "~2.0.0",
-    "atrocore/import": "~1.9.0"
+    "atrocore/core": "~2.0.9",
+    "atrocore/import": "~1.9.9"
   },
   "autoload": {
     "psr-4": {
