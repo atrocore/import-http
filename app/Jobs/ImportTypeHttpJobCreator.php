@@ -25,6 +25,7 @@ use Atro\Jobs\JobInterface;
 use Atro\Core\Utils\Util;
 use Espo\ORM\Entity;
 use Import\Entities\ImportFeed;
+use Import\ProcessingTypes\AbstractProcessingType;
 use Import\Services\ImportFeed as ImportFeedService;
 
 class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
@@ -71,6 +72,13 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     protected function prepareJobsData(ImportFeed $importFeed, array $data): array
     {
+        $className = $this->getMetadata()->get(['app', 'processingTypes', $importFeed->get('processingType'), 'className']);
+
+        if (!empty($className) && is_a($className, AbstractProcessingType::class, true) &&
+            method_exists($className, 'prepareJobsData')) {
+            return $this->getContainer()->get($className)->prepareJobsData($importFeed, $data, $this);
+        }
+
         $res = [];
 
         $payload = $data['payload'] ?? null;
@@ -371,7 +379,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         return true;
     }
 
-    protected function createAttachment(string $name, string $contents, string $folderId): File
+    public function createAttachment(string $name, string $contents, string $folderId): File
     {
         $input = new \stdClass();
         $input->name = $name;
