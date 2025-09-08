@@ -25,7 +25,30 @@
       "default": "GET",
       "notStorable": true,
       "dataField": true,
-      "prohibitedEmptyValue": true
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        },
+        "required": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "sourceFields": {
       "view": "import-http:views/import-feed/fields/source-fields"
