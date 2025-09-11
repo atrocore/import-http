@@ -11,7 +11,20 @@
       "default": false,
       "notStorable": true,
       "dataField": true,
-      "tooltip": true
+      "tooltip": true,
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpMethod": {
       "type": "enum",
@@ -57,40 +70,129 @@
       "type": "text",
       "notStorable": true,
       "dataField": true,
-      "view": "import-http:views/import-feed/fields/http-url"
+      "view": "import-http:views/import-feed/fields/http-url",
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        },
+        "required": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpBody": {
       "type": "text",
       "notStorable": true,
       "dataField": true,
       "view": "views/fields/script",
-      "useDisabledTextareaInViewMode": true
+      "useDisabledTextareaInViewMode": true,
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpOffset": {
       "type": "int",
       "notNull": true,
       "notStorable": true,
       "dataField": true,
-      "default": 0
+      "default": 0,
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpLimit": {
       "type": "int",
       "notNull": true,
       "notStorable": true,
       "dataField": true,
-      "default": 100
+      "default": 100,
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpTotal": {
       "type": "int",
       "notStorable": true,
       "dataField": true,
-      "default": null
+      "default": null,
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpConnectionId": {
       "type": "varchar",
       "view": "import-http:views/import-feed/fields/http-connection",
       "notStorable": true,
-      "dataField": true
+      "dataField": true,
+      "conditionalProperties": {
+        "visible": {
+          "conditionGroup": [
+            {
+              "type": "in",
+              "attribute": "type",
+              "value": [
+                "http"
+              ]
+            }
+          ]
+        }
+      }
     },
     "httpConnectionName": {
       "type": "varchar",
