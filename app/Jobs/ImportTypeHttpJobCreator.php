@@ -137,7 +137,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                     if (empty($parsedData)) {
                         // stop because no results
                         break;
-                    } else {
+                    } else if ($importFeed->get('processingType') === 'configurator') {
                         $identifiers = $this->getEntityManager()->getRepository('ImportConfiguratorItem')
                             ->where([
                                 'importFeedId'     => $importFeed->get('id'),
