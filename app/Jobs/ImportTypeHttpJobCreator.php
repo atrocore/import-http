@@ -229,7 +229,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
     {
         $attachment = $this->getEntityManager()->getRepository('File')->get($attachmentId);
 
-        if ($this->getImportFeedService()->hasParentJob($importFeed)) {
+        if ($this->getImportFeedService()->hasParentJob($importFeed) && empty($payload->parentJobId)) {
             $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }
