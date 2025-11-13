@@ -1,33 +1,33 @@
 {
   "fields": {
-    "mergeResponses": "",
-    "httpOffset": "",
-    "httpLimit": "",
-    "httpTotal": "",
+    "mergeResponses": "Łączenie odpowiedzi",
+    "httpOffset": "Przesunięcie żądania",
+    "httpLimit": "Limit żądań",
+    "httpTotal": "Całkowita liczba rekordów żądań",
     "httpUrl": "",
-    "httpMethod": "",
+    "httpMethod": "Metoda",
     "httpConnectionId": "",
-    "httpBody": "",
-    "importHttpHeaders": "",
-    "httpConnectionName": ""
+    "httpBody": "Treść wniosku",
+    "importHttpHeaders": "Nagłówki",
+    "httpConnectionName": "Nazwa połączenia"
   },
   "links": {
-    "importHttpHeaders": ""
+    "importHttpHeaders": "Nagłówki"
   },
   "labels": {
-    "http": "",
+    "http": "Żądanie HTTP",
     "execute": "",
-    "generateURL": "",
-    "generateSourceFields": ""
+    "generateURL": "Generowanie adresu URL",
+    "generateSourceFields": "Generowanie pól źródłowych"
   },
   "messages": {
-    "confirmUrlGeneration": "",
-    "confirmSourceFieldsGeneration": ""
+    "confirmUrlGeneration": "Czy na pewno chce Pan wygenerować adres URL?",
+    "confirmSourceFieldsGeneration": "Czy na pewno chcą Państwo wygenerować pola źródłowe?"
   },
   "exceptions": {
-    "urlOrBodyCannotBeFormed": ""
+    "urlOrBodyCannotBeFormed": "Nie można utworzyć adresu URL lub treści żądania, proszę sprawdzić parametry dla rekordów Offset, Limit i Total."
   },
   "tooltips": {
-    "mergeResponses": ""
+    "mergeResponses": "Po pobraniu wszystkie odpowiedzi są łączone przed rozpoczęciem przetwarzania. Przetwarzanie odbywa się w ramach pojedynczego zadania importu."
   }
 }
