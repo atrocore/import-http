@@ -4,9 +4,9 @@
     "httpOffset": "Przesunięcie żądania",
     "httpLimit": "Limit żądań",
     "httpTotal": "Całkowita liczba rekordów żądań",
-    "httpUrl": "",
+    "httpUrl": "URL AtroCore",
     "httpMethod": "Metoda",
-    "httpConnectionId": "",
+    "httpConnectionId": "Połączenie",
     "httpBody": "Treść wniosku",
     "importHttpHeaders": "Nagłówki",
     "httpConnectionName": "Nazwa połączenia"
@@ -16,7 +16,7 @@
   },
   "labels": {
     "http": "Żądanie HTTP",
-    "execute": "",
+    "execute": "Wykonaj",
     "generateURL": "Generowanie adresu URL",
     "generateSourceFields": "Generowanie pól źródłowych"
   },
