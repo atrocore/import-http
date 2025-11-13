@@ -1,10 +1,10 @@
 {
   "fields": {
-    "name": "",
+    "name": "Clave",
     "value": "",
-    "importFeed": ""
+    "importFeed": "Importación"
   },
   "links": {
-    "importFeed": ""
+    "importFeed": "Importación"
   }
 }
