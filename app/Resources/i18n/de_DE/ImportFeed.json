@@ -6,7 +6,10 @@
     "httpOffset": "Offset anfordern",
     "httpLimit": "Limit anfordern",
     "httpBody": "Anfrage Körper",
-    "httpTotal": "Total Anfrage Datensätze"
+    "httpTotal": "Total Anfrage Datensätze",
+    "httpUrl": "URL",
+    "httpMethod": "Methode",
+    "httpConnectionId": "Verbindung"
   },
   "links": {
     "importHttpHeaders": "Headers"
