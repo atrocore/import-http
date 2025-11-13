@@ -6,7 +6,10 @@
     "httpOffset": "Смещение запроса",
     "httpLimit": "Лимит запросов",
     "httpTotal": "Всего записей запросов",
-    "httpConnectionName": "Имя соединения"
+    "httpConnectionName": "Имя соединения",
+    "httpUrl": "URL",
+    "httpMethod": "Метод",
+    "httpConnectionId": "Соединение"
   },
   "links": {
     "importHttpHeaders": "Заголовки"
