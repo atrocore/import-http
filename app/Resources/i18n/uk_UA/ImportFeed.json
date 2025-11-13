@@ -8,7 +8,8 @@
     "httpUrl": "URL",
     "mergeResponses": "Об'єднати відповіді",
     "httpTotal": "Всього записів запитів",
-    "httpMethod": "Метод"
+    "httpMethod": "Метод",
+    "httpConnectionId": "З'єднання"
   },
   "links": {
     "importHttpHeaders": "Заголовки"
