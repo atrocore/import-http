@@ -4,9 +4,9 @@
     "httpOffset": "Posunutí požadavku",
     "httpLimit": "Limit požadavků",
     "httpTotal": "Záznamy o požadavcích celkem",
-    "httpUrl": "",
+    "httpUrl": "URL",
     "httpMethod": "Metoda",
-    "httpConnectionId": "",
+    "httpConnectionId": "Připojení",
     "httpBody": "Tělo žádosti",
     "importHttpHeaders": "Záhlaví",
     "httpConnectionName": "Název připojení"
