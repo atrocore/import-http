@@ -1,33 +1,33 @@
 {
   "fields": {
-    "mergeResponses": "",
-    "httpOffset": "",
-    "httpLimit": "",
-    "httpTotal": "",
+    "mergeResponses": "Sloučení odpovědí",
+    "httpOffset": "Posunutí požadavku",
+    "httpLimit": "Limit požadavků",
+    "httpTotal": "Záznamy o požadavcích celkem",
     "httpUrl": "",
-    "httpMethod": "",
+    "httpMethod": "Metoda",
     "httpConnectionId": "",
-    "httpBody": "",
-    "importHttpHeaders": "",
-    "httpConnectionName": ""
+    "httpBody": "Tělo žádosti",
+    "importHttpHeaders": "Záhlaví",
+    "httpConnectionName": "Název připojení"
   },
   "links": {
-    "importHttpHeaders": ""
+    "importHttpHeaders": "Záhlaví"
   },
   "labels": {
-    "http": "",
-    "execute": "",
-    "generateURL": "",
-    "generateSourceFields": ""
+    "http": "Požadavek HTTP",
+    "execute": "Provést",
+    "generateURL": "Generování adresy URL",
+    "generateSourceFields": "Generování zdrojových polí"
   },
   "messages": {
-    "confirmUrlGeneration": "",
-    "confirmSourceFieldsGeneration": ""
+    "confirmUrlGeneration": "Určitě chcete vygenerovat adresu URL?",
+    "confirmSourceFieldsGeneration": "Jste si jisti, že chcete generovat zdrojová pole?"
   },
   "exceptions": {
-    "urlOrBodyCannotBeFormed": ""
+    "urlOrBodyCannotBeFormed": "URL nebo Tělo požadavku nelze vytvořit, zkontrolujte prosím parametry pro záznamy Offset, Limit a Total."
   },
   "tooltips": {
-    "mergeResponses": ""
+    "mergeResponses": "Po stažení se všechny odpovědi před zahájením zpracování sloučí. Zpracování se provádí v rámci jedné importní úlohy."
   }
 }
