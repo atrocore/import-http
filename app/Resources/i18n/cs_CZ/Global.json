@@ -1,1 +1,8 @@
-{}
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Importovat hlavičku krmiva"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Import záhlaví krmiva"
+  }
+}
