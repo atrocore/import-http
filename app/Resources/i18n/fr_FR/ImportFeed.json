@@ -1,33 +1,33 @@
 {
   "fields": {
-    "mergeResponses": "",
-    "httpOffset": "",
-    "httpLimit": "",
-    "httpTotal": "",
+    "mergeResponses": "Fusionner les réponses",
+    "httpOffset": "Demande de décalage",
+    "httpLimit": "Limite de la demande",
+    "httpTotal": "Total des dossiers de demande",
     "httpUrl": "",
-    "httpMethod": "",
+    "httpMethod": "Méthode",
     "httpConnectionId": "",
-    "httpBody": "",
-    "importHttpHeaders": "",
-    "httpConnectionName": ""
+    "httpBody": "Corps de la demande",
+    "importHttpHeaders": "En-têtes",
+    "httpConnectionName": "Nom de la connexion"
   },
   "links": {
-    "importHttpHeaders": ""
+    "importHttpHeaders": "En-têtes"
   },
   "labels": {
-    "http": "",
+    "http": "Demande HTTP",
     "execute": "",
-    "generateURL": "",
-    "generateSourceFields": ""
+    "generateURL": "Générer l'URL",
+    "generateSourceFields": "Générer des champs sources"
   },
   "messages": {
-    "confirmUrlGeneration": "",
-    "confirmSourceFieldsGeneration": ""
+    "confirmUrlGeneration": "Êtes-vous sûr de vouloir générer une URL ?",
+    "confirmSourceFieldsGeneration": "Êtes-vous sûr de vouloir générer des champs sources ?"
   },
   "exceptions": {
-    "urlOrBodyCannotBeFormed": ""
+    "urlOrBodyCannotBeFormed": "L'URL ou le corps de la requête ne peut pas être formé, veuillez vérifier vos paramètres pour les enregistrements Offset, Limit et Total."
   },
   "tooltips": {
-    "mergeResponses": ""
+    "mergeResponses": "Une fois téléchargées, toutes les réponses sont fusionnées avant de commencer le traitement. Le traitement est effectué en une seule tâche d'importation."
   }
 }
