@@ -4,9 +4,9 @@
     "httpOffset": "Demande de décalage",
     "httpLimit": "Limite de la demande",
     "httpTotal": "Total des dossiers de demande",
-    "httpUrl": "",
+    "httpUrl": "URL",
     "httpMethod": "Méthode",
-    "httpConnectionId": "",
+    "httpConnectionId": "Connexion",
     "httpBody": "Corps de la demande",
     "importHttpHeaders": "En-têtes",
     "httpConnectionName": "Nom de la connexion"
@@ -16,7 +16,7 @@
   },
   "labels": {
     "http": "Demande HTTP",
-    "execute": "",
+    "execute": "Exécuter",
     "generateURL": "Générer l'URL",
     "generateSourceFields": "Générer des champs sources"
   },
