@@ -2,7 +2,13 @@
   "fields": {
     "importHttpHeaders": "Заголовки",
     "httpConnectionName": "Назва з'єднання",
-    "httpBody": "Тіло запиту"
+    "httpBody": "Тіло запиту",
+    "httpOffset": "Зміщення запиту",
+    "httpLimit": "Ліміт запитів",
+    "httpUrl": "URL",
+    "mergeResponses": "Об'єднати відповіді",
+    "httpTotal": "Всього записів запитів",
+    "httpMethod": "Метод"
   },
   "links": {
     "importHttpHeaders": "Заголовки"
@@ -19,5 +25,8 @@
   },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL або Request Body не можна сформувати, будь ласка перевірте параметри Offset, Limit та Total records."
+  },
+  "tooltips": {
+    "mergeResponses": "Після завантаження всі відповіді об'єднуються перед початком обробки. Обробка виконується в одному завданні на імпорт."
   }
 }
