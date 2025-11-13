@@ -1,0 +1,33 @@
+{
+  "fields": {
+    "mergeResponses": "",
+    "httpOffset": "",
+    "httpLimit": "",
+    "httpTotal": "",
+    "httpUrl": "",
+    "httpMethod": "",
+    "httpConnectionId": "",
+    "httpBody": "",
+    "importHttpHeaders": "",
+    "httpConnectionName": ""
+  },
+  "links": {
+    "importHttpHeaders": ""
+  },
+  "labels": {
+    "http": "",
+    "execute": "",
+    "generateURL": "",
+    "generateSourceFields": ""
+  },
+  "messages": {
+    "confirmUrlGeneration": "",
+    "confirmSourceFieldsGeneration": ""
+  },
+  "exceptions": {
+    "urlOrBodyCannotBeFormed": ""
+  },
+  "tooltips": {
+    "mergeResponses": ""
+  }
+}
