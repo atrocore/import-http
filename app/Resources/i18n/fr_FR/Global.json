@@ -1,8 +1,8 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Importation de l'en-tête du flux"
+    "ImportHttpHeader": "Entête du flux d'import"
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Importation d'en-têtes de flux"
+    "ImportHttpHeader": "Entêtes du flux d'import"
   }
 }
