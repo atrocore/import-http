@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "name": "Clé",
+    "value": "Valeur",
+    "importFeed": "Flux d'import"
+  },
+  "links": {
+    "importFeed": "Flux d'import"
+  }
+}

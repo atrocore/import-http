@@ -1,6 +1,15 @@
 {
   "fields": {
-    "importHttpHeaders": "Заголовки"
+    "importHttpHeaders": "Заголовки",
+    "mergeResponses": "Объедините ответы",
+    "httpBody": "Тело запроса",
+    "httpOffset": "Смещение запроса",
+    "httpLimit": "Лимит запросов",
+    "httpTotal": "Всего записей запросов",
+    "httpConnectionName": "Имя соединения",
+    "httpUrl": "URL",
+    "httpMethod": "Метод",
+    "httpConnectionId": "Соединение"
   },
   "links": {
     "importHttpHeaders": "Заголовки"
@@ -17,5 +26,8 @@
   },
   "exceptions": {
     "urlOrBodyCannotBeFormed": "URL или Request Body нельзя сформировать, пожалуйста проверьте параметры Offset, Limit и Total records."
+  },
+  "tooltips": {
+    "mergeResponses": "После загрузки все ответы объединяются перед началом обработки. Обработка выполняется в рамках одного задания импорта."
   }
 }

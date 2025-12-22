@@ -1,0 +1,8 @@
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Importuj nagłówek kanału"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Importowanie nagłówków kanałów"
+  }
+}

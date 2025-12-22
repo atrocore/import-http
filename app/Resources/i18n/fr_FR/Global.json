@@ -1,0 +1,8 @@
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Entête du flux d'import"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Entêtes du flux d'import"
+  }
+}

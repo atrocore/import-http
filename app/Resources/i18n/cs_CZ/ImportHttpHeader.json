@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "name": "Klíč",
+    "value": "Hodnota",
+    "importFeed": "Importní krmivo"
+  },
+  "links": {
+    "importFeed": "Importní krmivo"
+  }
+}

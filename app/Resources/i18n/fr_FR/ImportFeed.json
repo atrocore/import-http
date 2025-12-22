@@ -1,0 +1,33 @@
+{
+  "fields": {
+    "mergeResponses": "Fusionner les réponses",
+    "httpOffset": "Décalage (Offset) de la requête",
+    "httpLimit": "Limite de requête",
+    "httpTotal": "Total des enregistrements de la requête",
+    "httpUrl": "URL",
+    "httpMethod": "Méthode",
+    "httpConnectionId": "Connexion",
+    "httpBody": "Corps de la requête",
+    "importHttpHeaders": "En-têtes",
+    "httpConnectionName": "Nom de la connexion"
+  },
+  "links": {
+    "importHttpHeaders": "En-têtes"
+  },
+  "labels": {
+    "http": "Requête HTTP",
+    "execute": "Exécuter",
+    "generateURL": "Générer l'URL",
+    "generateSourceFields": "Générer des champs de la source"
+  },
+  "messages": {
+    "confirmUrlGeneration": "Êtes-vous sûr de vouloir générer une URL ?",
+    "confirmSourceFieldsGeneration": "Êtes-vous sûr de vouloir générer des champs de la source ?"
+  },
+  "exceptions": {
+    "urlOrBodyCannotBeFormed": "L'URL ou le corps de la requête ne peut pas être formé, veuillez vérifier vos paramètres pour le décalage, la limite et le total des enregistrement."
+  },
+  "tooltips": {
+    "mergeResponses": "Une fois téléchargées, toutes les réponses sont fusionnées avant de commencer le traitement. Le traitement est effectué en une seule tâche d'importation."
+  }
+}
