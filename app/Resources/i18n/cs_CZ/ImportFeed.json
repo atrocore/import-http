@@ -2,7 +2,7 @@
   "fields": {
     "mergeResponses": "Sloučení odpovědí",
     "httpOffset": "Posunutí požadavku",
-    "httpLimit": "Limit požadavků",
+    "httpLimit": "Limit žádosti",
     "httpTotal": "Záznamy o požadavcích celkem",
     "httpUrl": "URL",
     "httpMethod": "Metoda",
