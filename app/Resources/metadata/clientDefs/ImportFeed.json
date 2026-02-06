@@ -3,7 +3,14 @@
     "importHttpHeaders": {
       "select": false,
       "view": "import-http:views/import-feed/record/panels/headers",
-      "rowActionsView": "views/record/row-actions/edit-and-remove"
+      "actions": {
+        "unlinkRelated": {
+          "disabled": true
+        },
+        "quickView": {
+          "disabled": true
+        }
+      }
     }
   }
 }

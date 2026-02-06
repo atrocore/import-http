@@ -15,5 +15,6 @@
   "hasAssignedUser": false,
   "hasTeam": false,
   "hasOwner": false,
-  "emHidden": true
+  "emHidden": true,
+  "bookmarkDisabled": true
 }
