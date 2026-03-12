@@ -1,0 +1,8 @@
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Importazione dell'intestazione del mangime"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Importazione delle intestazioni dei mangimi"
+  }
+}

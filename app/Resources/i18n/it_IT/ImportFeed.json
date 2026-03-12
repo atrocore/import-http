@@ -1,0 +1,33 @@
+{
+  "fields": {
+    "mergeResponses": "Unire le risposte",
+    "httpOffset": "Richiesta di offset",
+    "httpLimit": "Limite di richiesta",
+    "httpTotal": "Totale record di richiesta",
+    "httpUrl": "URL",
+    "httpMethod": "Metodo",
+    "httpConnectionId": "Connessione",
+    "httpBody": "Corpo della richiesta",
+    "importHttpHeaders": "Intestazioni",
+    "httpConnectionName": "Nome della connessione"
+  },
+  "links": {
+    "importHttpHeaders": "Intestazioni"
+  },
+  "labels": {
+    "http": "Richiesta HTTP",
+    "execute": "Eseguire",
+    "generateURL": "Genera URL",
+    "generateSourceFields": "Genera campi sorgente"
+  },
+  "messages": {
+    "confirmUrlGeneration": "È sicuro di voler generare un URL?",
+    "confirmSourceFieldsGeneration": "È sicuro di voler generare dei campi sorgente?"
+  },
+  "exceptions": {
+    "urlOrBodyCannotBeFormed": "L'URL o il corpo della richiesta non possono essere formati, controlli i parametri per i record Offset, Limite e Totale."
+  },
+  "tooltips": {
+    "mergeResponses": "Una volta scaricate, tutte le risposte vengono unite prima di iniziare l'elaborazione. L'elaborazione viene eseguita in un unico lavoro di importazione."
+  }
+}
