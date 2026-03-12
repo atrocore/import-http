@@ -23,13 +23,12 @@ class ImportFeedLayout extends AbstractLayoutListener
         $result = $event->getArgument('result');
 
         $result[1]['rows'][] = [['name' => 'httpOffset'], ['name' => 'httpLimit']];
-        $result[1]['rows'][] = [['name' => 'httpTotal'], false];
-        $result[1]['rows'][] = [['name' => 'httpMethod'], ['name' => 'httpConnectionId']];
+        $result[1]['rows'][] = [['name' => 'httpMethod'], ['name' => 'httpTotal']];
         $result[1]['rows'][] = [['name' => 'httpUrl', 'fullWidth' => true]];
         $result[1]['rows'][] = [['name' => 'httpBody', 'fullWidth' => true]];
         $result[1]['rows'][] = [['name' => 'mergeResponses'], false];
 
-        $event->setArgument('result',  $result);
+        $event->setArgument('result', $result);
     }
 
     public function relationships(Event $event): void
@@ -38,6 +37,6 @@ class ImportFeedLayout extends AbstractLayoutListener
 
         $result = array_merge([['name' => 'importHttpHeaders', 'canClose' => false]], $result);
 
-        $event->setArgument('result',  $result);
+        $event->setArgument('result', $result);
     }
 }
