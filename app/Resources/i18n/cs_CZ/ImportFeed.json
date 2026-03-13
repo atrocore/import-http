@@ -6,7 +6,6 @@
     "httpTotal": "Záznamy o požadavcích celkem",
     "httpUrl": "URL",
     "httpMethod": "Metoda",
-    "httpConnectionId": "Připojení",
     "httpBody": "Tělo žádosti",
     "importHttpHeaders": "Záhlaví",
     "httpConnectionName": "Název připojení"

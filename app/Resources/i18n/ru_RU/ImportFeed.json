@@ -8,8 +8,7 @@
     "httpTotal": "Всего записей запросов",
     "httpConnectionName": "Имя соединения",
     "httpUrl": "URL",
-    "httpMethod": "Метод",
-    "httpConnectionId": "Соединение"
+    "httpMethod": "Метод"
   },
   "links": {
     "importHttpHeaders": "Заголовки"

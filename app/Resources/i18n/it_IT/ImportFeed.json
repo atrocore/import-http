@@ -6,7 +6,6 @@
     "httpTotal": "Totale record di richiesta",
     "httpUrl": "URL",
     "httpMethod": "Metodo",
-    "httpConnectionId": "Connessione",
     "httpBody": "Corpo della richiesta",
     "importHttpHeaders": "Intestazioni",
     "httpConnectionName": "Nome della connessione"

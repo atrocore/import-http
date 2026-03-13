@@ -6,7 +6,6 @@
     "httpTotal": "Total de registros solicitados",
     "httpUrl": "URL",
     "httpMethod": "Método",
-    "httpConnectionId": "Conexión",
     "httpBody": "Cuerpo de la solicitud",
     "importHttpHeaders": "Cabeceras",
     "httpConnectionName": "Nombre de la conexión"

@@ -6,7 +6,6 @@
     "httpTotal": "Całkowita liczba rekordów żądań",
     "httpUrl": "URL AtroCore",
     "httpMethod": "Metoda",
-    "httpConnectionId": "Połączenie",
     "httpBody": "Treść wniosku",
     "importHttpHeaders": "Nagłówki",
     "httpConnectionName": "Nazwa połączenia"
