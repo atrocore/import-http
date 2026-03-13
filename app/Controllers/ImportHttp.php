@@ -39,7 +39,7 @@ class ImportHttp extends AbstractController
             throw new BadRequest("Import Feed with ID '{$data->importFeedId}' does not exists.");
         }
 
-        $connectionType = $this->getImportTypeHttpJobCreator()->createConnection($importFeed->get('httpConnectionId'));
+        $connectionType = $this->getImportTypeHttpJobCreator()->createConnection($importFeed->get('connectionId'));
 
         return ['url' => $connectionType->generateUrlForEntity($importFeed->get('entity'))];
     }

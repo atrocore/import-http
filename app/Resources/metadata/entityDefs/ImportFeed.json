@@ -175,29 +175,6 @@
         }
       }
     },
-    "httpConnectionId": {
-      "type": "varchar",
-      "view": "import-http:views/import-feed/fields/http-connection",
-      "notStorable": true,
-      "dataField": true,
-      "conditionalProperties": {
-        "visible": {
-          "conditionGroup": [
-            {
-              "type": "in",
-              "attribute": "type",
-              "value": [
-                "http"
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "httpConnectionName": {
-      "type": "varchar",
-      "notStorable": true
-    },
     "importHttpHeaders": {
       "type": "linkMultiple",
       "layoutDetailDisabled": true,

@@ -312,7 +312,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $attachmentName = $this->createFileName($importFeed->get('name'), $ext);
 
         $response = $this
-            ->createConnection($importFeed->getFeedField('httpConnectionId') ?? null)
+            ->createConnection($importFeed->get('connectionId') ?? null)
             ->request($httpUrl, $httpMethod, $headers, $httpBody);
 
         $folder = $this->getImportFeedService()->createImportFileFolder($importFeed);
@@ -500,12 +500,12 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         return $fileParser->getFileData($file);
     }
 
-    public function createConnection(?string $httpConnectionId): HttpConnectionInterface
+    public function createConnection(?string $connectionId): HttpConnectionInterface
     {
-        if (empty($httpConnectionId)) {
+        if (empty($connectionId)) {
             return $this->getContainer()->get(ConnectionHttp::class);
         }
 
-        return $this->getContainer()->get('connectionFactory')->createById($httpConnectionId);
+        return $this->getContainer()->get('connectionFactory')->createById($connectionId);
     }
 }

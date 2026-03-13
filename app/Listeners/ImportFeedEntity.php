@@ -24,8 +24,8 @@ class ImportFeedEntity extends AbstractListener
     {
         $entity = $event->getArgument('entity');
 
-        if (!empty($entity->get('httpConnectionId'))) {
-            $connection = $this->getEntityManager()->getEntity('Connection', $entity->get('httpConnectionId'));
+        if (!empty($entity->get('connectionId'))) {
+            $connection = $this->getEntityManager()->getEntity('Connection', $entity->get('connectionId'));
             if (!empty($connection)) {
                 $connectionClass = $this->getMetadata()->get(['app', 'connectionTypes', $connection->get('type')]);
                 if (!is_a($connectionClass, HttpConnectionInterface::class, true)) {
