@@ -25,15 +25,31 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 #[Route(
     path: '/ImportHttp/action/generateSourceFields',
-    methods: ['POST'],
+    methods: [
+        'POST',
+    ],
     summary: 'Generate source fields for HTTP import feed',
     description: 'Fetches sample data from the HTTP source and returns the detected source fields.',
     tag: 'ImportHttp',
-    requestBody: ['required' => true, 'content' => ['application/json' => ['schema' => ['type' => 'object', 'required' => ['importFeedId'], 'properties' => ['importFeedId' => ['type' => 'string']]]]]],
+    requestBody: ['required' => true, 'content' => ['application/json' => ['schema' => ['type' => 'object', 'required' => [
+        'importFeedId',
+    ], 'properties' => ['importFeedId' => [
+        'type' => 'string',
+    ]]]]]],
     responses: [
-        200 => ['description' => 'Source fields', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['fileId' => ['type' => 'string'], 'fileName' => ['type' => 'string'], 'sourceFields' => ['type' => 'array', 'items' => ['type' => 'string']]]]]]],
-        400 => ['description' => 'importFeedId is required or feed not found'],
-        403 => ['description' => 'Forbidden'],
+        200 => ['description' => 'Source fields', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['fileId' => [
+            'type' => 'string',
+        ], 'fileName' => [
+            'type' => 'string',
+        ], 'sourceFields' => ['type' => 'array', 'items' => [
+            'type' => 'string',
+        ]]]]]]],
+        400 => [
+            'description' => 'importFeedId is required or feed not found',
+        ],
+        403 => [
+            'description' => 'Forbidden',
+        ],
     ],
 )]
 class GenerateSourceFieldsHandler extends AbstractHandler

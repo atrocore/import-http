@@ -25,15 +25,27 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 #[Route(
     path: '/ImportHttp/action/generateURL',
-    methods: ['POST'],
+    methods: [
+        'POST',
+    ],
     summary: 'Generate HTTP URL for import feed',
     description: 'Generates an endpoint URL for the specified import feed connection.',
     tag: 'ImportHttp',
-    requestBody: ['required' => true, 'content' => ['application/json' => ['schema' => ['type' => 'object', 'required' => ['importFeedId'], 'properties' => ['importFeedId' => ['type' => 'string']]]]]],
+    requestBody: ['required' => true, 'content' => ['application/json' => ['schema' => ['type' => 'object', 'required' => [
+        'importFeedId',
+    ], 'properties' => ['importFeedId' => [
+        'type' => 'string',
+    ]]]]]],
     responses: [
-        200 => ['description' => 'Generated URL', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['url' => ['type' => 'string']]]]]],
-        400 => ['description' => 'importFeedId is required or feed not found'],
-        403 => ['description' => 'Forbidden'],
+        200 => ['description' => 'Generated URL', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['url' => [
+            'type' => 'string',
+        ]]]]]],
+        400 => [
+            'description' => 'importFeedId is required or feed not found',
+        ],
+        403 => [
+            'description' => 'Forbidden',
+        ],
     ],
 )]
 class GenerateURLHandler extends AbstractHandler
