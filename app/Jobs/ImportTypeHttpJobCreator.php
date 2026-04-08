@@ -375,8 +375,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $input->hidden = true;
         $input->folderId = $this->getImportFeedService()->createImportFileFolder($importFeed)->get('id');
 
-        $file = $this->getService('File')->moveLocalFileToFileEntity($input, $tmpFile);
-        $fileId = is_array($file) ? $file['id'] : $file->get('id');
+        $fileId = $this->getService('File')->moveLocalFileToFileEntity($input, $tmpFile);
 
         // delete all tmp files
         Util::removeDir($tmpDir);
@@ -401,9 +400,9 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $input->hidden = true;
         $input->folderId = $folderId;
 
-        $fileData = $this->getService('File')->createFileViaContents($input, $contents);
+        $fileId = $this->getService('File')->createFileViaContents($input, $contents);
 
-        return is_array($fileData) ? $this->getEntityManager()->getRepository('File')->get($fileData['id']) : $fileData;
+        return $this->getEntityManager()->getRepository('File')->get($fileId);
     }
 
     protected function combineCSVs(
