@@ -24,31 +24,61 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 #[Route(
-    path: '/ImportHttp/action/generateSourceFields',
+    path: '/ImportHttp/generateSourceFields',
     methods: [
         'POST',
     ],
-    summary: 'Generate source fields for HTTP import feed',
-    description: 'Fetches sample data from the HTTP source and returns the detected source fields.',
+    summary: 'Generate source fields',
+    description: 'Fetches a sample response from the configured HTTP source and returns the detected field names for use in import feed column mapping.',
     tag: 'ImportHttp',
-    requestBody: ['required' => true, 'content' => ['application/json' => ['schema' => ['type' => 'object', 'required' => [
-        'importFeedId',
-    ], 'properties' => ['importFeedId' => [
-        'type' => 'string',
-    ]]]]]],
+    requestBody: [
+        'required' => true,
+        'content'  => [
+            'application/json' => [
+                'schema' => [
+                    'type'       => 'object',
+                    'required'   => [
+                        'importFeedId',
+                    ],
+                    'properties' => [
+                        'importFeedId' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
     responses: [
-        200 => ['description' => 'Source fields', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['fileId' => [
-            'type' => 'string',
-        ], 'fileName' => [
-            'type' => 'string',
-        ], 'sourceFields' => ['type' => 'array', 'items' => [
-            'type' => 'string',
-        ]]]]]]],
+        200 => [
+            'description' => 'Detected source fields and the temporary attachment created from the HTTP response',
+            'content'     => [
+                'application/json' => [
+                    'schema' => [
+                        'type'       => 'object',
+                        'properties' => [
+                            'fileId'       => [
+                                'type' => 'string',
+                            ],
+                            'fileName'     => [
+                                'type' => 'string',
+                            ],
+                            'sourceFields' => [
+                                'type'  => 'array',
+                                'items' => [
+                                    'type' => 'string',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
         400 => [
-            'description' => 'importFeedId is required or feed not found',
+            'description' => 'importFeedId is required or the import feed does not exist',
         ],
         403 => [
-            'description' => 'Forbidden',
+            'description' => 'Access denied',
         ],
     ],
 )]

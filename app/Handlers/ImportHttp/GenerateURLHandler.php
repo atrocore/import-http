@@ -24,27 +24,52 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 #[Route(
-    path: '/ImportHttp/action/generateURL',
+    path: '/ImportHttp/generateURL',
     methods: [
         'POST',
     ],
-    summary: 'Generate HTTP URL for import feed',
-    description: 'Generates an endpoint URL for the specified import feed connection.',
+    summary: 'Generate connection URL',
+    description: 'Builds and returns the resolved endpoint URL for the connection attached to the specified import feed.',
     tag: 'ImportHttp',
-    requestBody: ['required' => true, 'content' => ['application/json' => ['schema' => ['type' => 'object', 'required' => [
-        'importFeedId',
-    ], 'properties' => ['importFeedId' => [
-        'type' => 'string',
-    ]]]]]],
+    requestBody: [
+        'required' => true,
+        'content'  => [
+            'application/json' => [
+                'schema' => [
+                    'type'       => 'object',
+                    'required'   => [
+                        'importFeedId',
+                    ],
+                    'properties' => [
+                        'importFeedId' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
     responses: [
-        200 => ['description' => 'Generated URL', 'content' => ['application/json' => ['schema' => ['type' => 'object', 'properties' => ['url' => [
-            'type' => 'string',
-        ]]]]]],
+        200 => [
+            'description' => 'Resolved connection URL',
+            'content'     => [
+                'application/json' => [
+                    'schema' => [
+                        'type'       => 'object',
+                        'properties' => [
+                            'url' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
         400 => [
-            'description' => 'importFeedId is required or feed not found',
+            'description' => 'importFeedId is required or the import feed does not exist',
         ],
         403 => [
-            'description' => 'Forbidden',
+            'description' => 'Access denied',
         ],
     ],
 )]

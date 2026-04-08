@@ -42,7 +42,7 @@ Espo.define('import-http:views/import-feed/fields/source-fields', 'import:views/
                         message: this.translate('confirmSourceFieldsGeneration', 'messages', 'ImportFeed'),
                         confirmText: this.translate('Apply')
                     }, () => {
-                        this.ajaxPostRequest('ImportHttp/action/generateSourceFields', {importFeedId: this.model.get('id')}).then(res => {
+                        this.ajaxPostRequest('ImportHttp/generateSourceFields', {importFeedId: this.model.get('id')}).then(res => {
                             this.model.set(res);
                             this.model.save().then(() => {
                                 this.notify('Saved', 'success');
