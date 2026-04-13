@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace ImportHttp\Handlers\ImportHttp;
 
 use Atro\Core\Exceptions\BadRequest;
-use Atro\Core\Exceptions\Forbidden;
 use Atro\Core\Http\Response\JsonResponse;
 use Atro\Core\Routing\Route;
 use Atro\Handlers\AbstractHandler;
-use ImportHttp\Jobs\ImportTypeHttpJobCreator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -26,32 +24,24 @@ use Psr\Http\Server\RequestHandlerInterface;
 #[Route(
     path: '/ImportHttp/generateSourceFields',
     methods: [
-        'POST',
+        'GET',
     ],
     summary: 'Generate source fields',
-    description: 'Fetches a sample response from the configured HTTP source and returns the detected field names for use in import feed column mapping.',
+    description: 'Fetches a sample response from the configured HTTP source and returns the detected source fields for use in import feed column mapping.',
     tag: 'ImportHttp',
-    requestBody: [
-        'required' => true,
-        'content'  => [
-            'application/json' => [
-                'schema' => [
-                    'type'       => 'object',
-                    'required'   => [
-                        'importFeedId',
-                    ],
-                    'properties' => [
-                        'importFeedId' => [
-                            'type' => 'string',
-                        ],
-                    ],
-                ],
+    parameters: [
+        [
+            'name'     => 'importFeedId',
+            'in'       => 'query',
+            'required' => true,
+            'schema'   => [
+                'type' => 'string',
             ],
         ],
     ],
     responses: [
         200 => [
-            'description' => 'Detected source fields and the temporary attachment created from the HTTP response',
+            'description' => 'Detected source fields and the temporary file created from the HTTP response',
             'content'     => [
                 'application/json' => [
                     'schema' => [
@@ -75,10 +65,13 @@ use Psr\Http\Server\RequestHandlerInterface;
             ],
         ],
         400 => [
-            'description' => 'importFeedId is required or the import feed does not exist',
+            'description' => 'importFeedId is required',
         ],
         403 => [
             'description' => 'Access denied',
+        ],
+        404 => [
+            'description' => 'Import feed not found',
         ],
     ],
 )]
@@ -86,42 +79,12 @@ class GenerateSourceFieldsHandler extends AbstractHandler
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!$this->getAcl()->check('ImportFeed', 'edit')) {
-            throw new Forbidden();
+        $importFeedId = $request->getQueryParams()['importFeedId'] ?? '';
+
+        if (empty($importFeedId)) {
+            throw new BadRequest("'importFeedId' is required.");
         }
 
-        $data = $this->getRequestBody($request);
-
-        if (empty($data->importFeedId)) {
-            throw new BadRequest('Import Feed ID is required');
-        }
-
-        $importFeed = $this->getRecordService('ImportFeed')->getEntity((string) $data->importFeedId);
-        if (empty($importFeed)) {
-            throw new BadRequest("Import Feed with ID '{$data->importFeedId}' does not exists.");
-        }
-
-        $httpUrl = $this->container->get('twig')
-            ->renderTemplate((string) $importFeed->get('httpUrl'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
-
-        $attachment = $this->container->get(ImportTypeHttpJobCreator::class)->createAttachmentViaHttpRequest($importFeed, $httpUrl, '');
-
-        $payload                  = new \stdClass();
-        $payload->attachmentId    = $attachment->get('id');
-        $payload->format          = $importFeed->get('format');
-        $payload->delimiter       = $importFeed->get('fileFieldDelimiter');
-        $payload->enclosure       = ($importFeed->get('fileTextQualifier') == 'singleQuote') ? "'" : '"';
-        $payload->isFileHeaderRow = $importFeed->get('isFileHeaderRow');
-        $payload->sheet           = $importFeed->get('sheet');
-        $payload->excludedNodes   = $importFeed->get('excludedNodes');
-        $payload->keptStringNodes = $importFeed->get('keptStringNodes');
-
-        $sourceFields = $this->getRecordService('ImportFeed')->getFileColumns($payload);
-
-        return new JsonResponse([
-            'fileId'       => $attachment->get('id'),
-            'fileName'     => $attachment->get('name'),
-            'sourceFields' => $sourceFields,
-        ]);
+        return new JsonResponse($this->getRecordService('ImportHttp')->generateSourceFields($importFeedId));
     }
 }
