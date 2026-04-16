@@ -14,15 +14,19 @@ declare(strict_types=1);
 namespace ImportHttp\Listeners;
 
 use Atro\ConnectionType\HttpConnectionInterface;
-use Espo\Core\EventManager\Event;
-use Espo\Core\Exceptions\BadRequest;
-use Espo\Listeners\AbstractListener;
+use Atro\Core\EventManager\Event;
+use Atro\Core\Exceptions\BadRequest;
+use Atro\Listeners\AbstractListener;
 
 class ImportFeedEntity extends AbstractListener
 {
     public function beforeSave(Event $event): void
     {
         $entity = $event->getArgument('entity');
+
+        if($entity->get('type') !== 'http') {
+            return;
+        }
 
         if (!empty($entity->get('connectionId'))) {
             $connection = $this->getEntityManager()->getEntity('Connection', $entity->get('connectionId'));
