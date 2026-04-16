@@ -24,7 +24,7 @@ class ImportFeedEntity extends AbstractListener
     {
         $entity = $event->getArgument('entity');
 
-        if($entity->get('type') !== 'httpPro') {
+        if($entity->get('type') !== 'http') {
             return;
         }
 

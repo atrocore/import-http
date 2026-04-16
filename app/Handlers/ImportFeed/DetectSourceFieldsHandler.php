@@ -11,9 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ImportHttp\Handlers\ImportHttp;
+namespace ImportHttp\Handlers\ImportFeed;
 
-use Atro\Core\Exceptions\BadRequest;
 use Atro\Core\Http\Response\JsonResponse;
 use Atro\Core\Routing\Route;
 use Atro\Handlers\AbstractHandler;
@@ -22,41 +21,48 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 #[Route(
-    path: '/ImportHttp/generateURL',
+    path: '/ImportFeed/{id}/detectSourceFields',
     methods: [
-        'GET',
+        'POST',
     ],
-    summary: 'Generate connection URL',
-    description: 'Builds and returns the resolved endpoint URL for the connection attached to the specified import feed.',
-    tag: 'ImportHttp',
+    summary: 'Detect source fields',
+    description: 'Fetches a sample response from the configured HTTP source and returns the detected source fields for use in import feed column mapping.',
+    tag: 'ImportFeed',
     parameters: [
         [
-            'name'     => 'importFeedId',
-            'in'       => 'query',
-            'required' => true,
-            'schema'   => [
+            'name'        => 'id',
+            'in'          => 'path',
+            'required'    => true,
+            'description' => 'ID of the ImportFeed record.',
+            'schema'      => [
                 'type' => 'string',
             ],
         ],
     ],
     responses: [
         200 => [
-            'description' => 'Resolved connection URL',
+            'description' => 'Detected source fields and the temporary file created from the HTTP response',
             'content'     => [
                 'application/json' => [
                     'schema' => [
                         'type'       => 'object',
                         'properties' => [
-                            'url' => [
+                            'fileId'       => [
                                 'type' => 'string',
+                            ],
+                            'fileName'     => [
+                                'type' => 'string',
+                            ],
+                            'sourceFields' => [
+                                'type'  => 'array',
+                                'items' => [
+                                    'type' => 'string',
+                                ],
                             ],
                         ],
                     ],
                 ],
             ],
-        ],
-        400 => [
-            'description' => 'importFeedId is required',
         ],
         403 => [
             'description' => 'Access denied',
@@ -65,19 +71,16 @@ use Psr\Http\Server\RequestHandlerInterface;
             'description' => 'Import feed not found',
         ],
     ],
+    entities: [
+        'ImportFeed',
+    ],
 )]
-class GenerateURLHandler extends AbstractHandler
+class DetectSourceFieldsHandler extends AbstractHandler
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $importFeedId = $request->getQueryParams()['importFeedId'] ?? '';
+        $id = $request->getAttribute('id');
 
-        if (empty($importFeedId)) {
-            throw new BadRequest("'importFeedId' is required.");
-        }
-
-        $url = $this->getRecordService('ImportHttp')->generateURL($importFeedId);
-
-        return new JsonResponse(['url' => $url]);
+        return new JsonResponse($this->getRecordService('ImportHttp')->generateSourceFields($id));
     }
 }

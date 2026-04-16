@@ -33,7 +33,7 @@ Espo.define('import-http:views/import-feed/fields/http-url', 'views/fields/scrip
                         message: this.translate('confirmUrlGeneration', 'messages', 'ImportFeed'),
                         confirmText: this.translate('Apply')
                     }, () => {
-                        this.ajaxGetRequest('ImportHttp/generateURL', {importFeedId: this.model.get('id')}).then(res => {
+                        this.ajaxPostRequest('ImportFeed/' + this.model.get('id') + '/generateURL').then(res => {
                             if (res['url'] === this.model.get(this.name)) {
                                 Espo.Ui.notify(this.translate('notModified', 'messages'), 'warning');
                             } else {
