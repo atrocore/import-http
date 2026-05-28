@@ -31,11 +31,14 @@ use Import\Services\ImportFeed as ImportFeedService;
 class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 {
     protected $importFeedService = null;
+    protected ?string $importJobCreatorId = null;
 
     public function run(Job $job): void
     {
         $GLOBALS['skipAssignmentNotifications'] = true;
         $GLOBALS['skipHooks'] = true;
+
+        $this->importJobCreatorId = $job->get('id');
 
         $data = $job->getPayload();
 
@@ -133,11 +136,11 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                         'attachmentId' => $attachment->get('id')
                     ];
 
-                    $parsedData = $this->parseImportFeedFile($importFeed, $attachment);
-                    if (empty($parsedData)) {
+                    if (!$this->importFeedFileHasData($importFeed, $attachment)) {
                         // stop because no results
                         break;
                     } else if ($importFeed->get('processingType') === 'configurator') {
+                        $parsedData = $this->parseImportFeedFile($importFeed, $attachment);
                         $identifiers = $this->getEntityManager()->getRepository('ImportConfiguratorItem')
                             ->where([
                                 'importFeedId'     => $importFeed->get('id'),
@@ -262,6 +265,10 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
             ->getImportFeedService()
             ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'),
                 $payload)->get('id');
+
+        if (!empty($this->importJobCreatorId)) {
+            $jobData['importJobCreatorId'] = $this->importJobCreatorId;
+        }
 
         $this->getImportFeedService()->push($this->getImportFeedService()->getName($importFeed), 'ImportTypeHttp',
             $jobData);
@@ -483,6 +490,20 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
             }
         }
         return false;
+    }
+
+    protected function importFeedFileHasData(ImportFeed $importFeed, File $file): bool
+    {
+        $fileParser = $this->getFileParser($importFeed->getFeedField('format'));
+        $fileParser->setData([
+            'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
+            'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
+            'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
+            'emptyValue'      => $importFeed->getFeedField('emptyValue'),
+            'nullValue'       => $importFeed->getFeedField('nullValue'),
+        ]);
+
+        return $fileParser->hasFileData($file);
     }
 
     protected function parseImportFeedFile(ImportFeed $importFeed, File $file): array
