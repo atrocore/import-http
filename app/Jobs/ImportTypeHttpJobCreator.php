@@ -132,7 +132,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
                     $res[] = [
                         'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
+                        'payload'      => array_merge((array)$payload, ['httpRequest' => ['offset' => $offset, 'limit' => $limit]]),
                         'attachmentId' => $attachment->get('id')
                     ];
 
@@ -167,7 +167,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                     $data['offset'] = $offset;
                     $res[] = [
                         'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
+                        'payload'      => array_merge((array)$payload, ['httpRequest' => ['offset' => $offset, 'limit' => $limit]]),
                         'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
                         'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
                     ];
@@ -195,7 +195,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                 $data['page'] = $page;
                 $res[] = [
                     'importFeedId' => $importFeed->get('id'),
-                    'payload'      => $payload,
+                    'payload'      => array_merge((array)$payload, ['httpRequest' => ['page' => $page, 'limit' => $limit]]),
                     'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
                     'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
                 ];
@@ -205,7 +205,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                     $data['page'] = $page;
                     $res[] = [
                         'importFeedId' => $importFeed->get('id'),
-                        'payload'      => $payload,
+                        'payload'      => array_merge((array)$payload, ['httpRequest' => ['page' => $page, 'limit' => $limit]]),
                         'httpUrl'      => $this->twig()->renderTemplate($httpUrl, $data),
                         'httpBody'     => $this->twig()->renderTemplate($httpBody, $data)
                     ];
