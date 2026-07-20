@@ -45,7 +45,7 @@ class ImportTypeHttp extends \Import\Jobs\ImportTypeSimple implements JobInterfa
         ];
 
         if (!empty($payload) && !empty($payload->executeNow)) {
-            $this->getImportTypeHttpJobCreator()->run($jobData);
+            $this->getImportTypeHttpJobCreator()->runNow($jobData);
         } else {
             $job = $this->getEntityManager()->getEntity('Job');
             $job->set([
