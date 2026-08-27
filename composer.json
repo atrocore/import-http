@@ -2,7 +2,7 @@
   "name": "atrocore/import-http",
   "default": "",
   "require": {
-    "atrocore/core": "~2.3.0",
+    "atrocore/core": "~2.3.16",
     "atrocore/import": "~1.11.2"
   },
   "autoload": {
