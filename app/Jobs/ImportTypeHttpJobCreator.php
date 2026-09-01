@@ -373,12 +373,13 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
             throw new BadRequest('Creating combined file failed.');
         }
 
-        $tmpFile = $tmpDir . DIRECTORY_SEPARATOR . $this->createFileName($importFeed->get('name'), 'csv');
+        $combinedFileName = $this->createFileName($importFeed->get('name'), 'csv');
+        $tmpFile = $tmpDir . DIRECTORY_SEPARATOR . $combinedFileName;
 
         $this->combineCSVs($files, $tmpFile, $delimiter, $enclosure);
 
         $input = new \stdClass();
-        $input->name = $this->createFileName($importFeed->get('name'), 'csv');
+        $input->name = $combinedFileName;
         $input->hidden = true;
         $input->folderId = $this->getImportFeedService()->createImportFileFolder($importFeed)->get('id');
 
@@ -479,7 +480,12 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     protected function createFileName(string $str, string $ext): string
     {
-        return preg_replace('/[^a-z0-9_]/', '', str_replace(' ', '_', strtolower($str))) . '.' . $ext;
+        $base = preg_replace('/[^a-z0-9_]/', '', str_replace(' ', '_', strtolower($str)));
+
+        [$usec, $sec] = explode(' ', microtime());
+        $timestamp = date('YmdHis', (int) $sec) . substr($usec, 2, 3);
+
+        return sprintf('%s_%s.%s', $base, $timestamp, $ext);
     }
 
     protected function containsVariable(array $allExtractedExp, string $string): bool
