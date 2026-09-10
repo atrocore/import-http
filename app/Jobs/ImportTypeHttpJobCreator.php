@@ -35,12 +35,17 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     public function run(Job $job): void
     {
+        $this->runNow($job->getPayload(), $job);
+    }
+
+    public function runNow(array $data, ?Job $job = null): void
+    {
         $GLOBALS['skipAssignmentNotifications'] = true;
         $GLOBALS['skipHooks'] = true;
 
-        $this->importJobCreatorId = $job->get('id');
-
-        $data = $job->getPayload();
+        if (!empty($job)) {
+            $this->importJobCreatorId = $job->get('id');
+        }
 
         if (empty($data['importFeedId'])) {
             throw new BadRequest('ImportFeedId is required.');
