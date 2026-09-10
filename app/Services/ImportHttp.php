@@ -47,7 +47,7 @@ class ImportHttp extends AbstractService
         $payload->format = $importFeed->get('format');
         $payload->delimiter = $importFeed->get('fileFieldDelimiter');
         $payload->enclosure = $importFeed->get('fileTextQualifier');
-        $payload->isHeaderRow = $importFeed->get('isFileHeaderRow');
+        $payload->headerRowNumber = $importFeed->get('headerRowNumber');
         $payload->sheet = $importFeed->get('sheet');
         $payload->excludedNodes = $importFeed->get('excludedNodes');
         $payload->keptStringNodes = $importFeed->get('keptStringNodes');
