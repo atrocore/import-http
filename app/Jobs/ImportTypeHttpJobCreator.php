@@ -88,7 +88,13 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                     $this->createJobs($importFeed, $item['httpUrl'], (string)$item['httpBody'], $payload);
                 }
             } catch (\Throwable $e) {
-                $GLOBALS['log']->error('ImportTypeHttpJobCreator FAILED: ' . $e->getMessage());
+                if (!empty($parentJob)) {
+                    $parentJob->set('state', 'Failed');
+                    $parentJob->set('message', $e->getMessage());
+                    $this->getEntityManager()->saveEntity($parentJob);
+                }
+
+                throw $e;
             }
         }
     }
@@ -132,6 +138,9 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
                             $this->twig()->renderTemplate($httpBody, $data)
                         );
                     } catch (\Throwable $e) {
+                        if (empty($res)) {
+                            throw $e;
+                        }
                         break;
                     }
 
