@@ -34,10 +34,10 @@ class ImportHttp extends AbstractService
         }
 
         $httpUrl = $this->getInjection('twig')
-            ->renderTemplate((string)$importFeed->get('httpUrl'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
+            ->renderTemplate((string)$importFeed->getSubtype()->get('httpUrl'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
 
         $httpBody = $this->getInjection('twig')
-            ->renderTemplate((string)$importFeed->get('httpBody'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
+            ->renderTemplate((string)$importFeed->getSubtype()->get('httpBody'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
 
         $attachment = $this->getInjection(ImportTypeHttpJobCreator::class)
             ->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
@@ -73,7 +73,7 @@ class ImportHttp extends AbstractService
         }
 
         $connectionType = $this->getInjection(ImportTypeHttpJobCreator::class)
-            ->createConnection($importFeed->get('connectionId'));
+            ->createConnection($importFeed->getSubtype()->get('connectionId'));
 
         return $connectionType->generateUrlForEntity($importFeed->get('entity'));
     }

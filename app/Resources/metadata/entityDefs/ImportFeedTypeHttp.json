@@ -1,0 +1,69 @@
+{
+  "fields": {
+    "connection": {
+      "type": "link"
+    },
+    "mergeResponses": {
+      "type": "bool",
+      "default": false,
+      "tooltip": true
+    },
+    "httpMethod": {
+      "type": "enum",
+      "options": [
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "GET"
+      ],
+      "default": "GET",
+      "required": true
+    },
+    "httpUrl": {
+      "type": "code",
+      "engine": "Twig",
+      "variables": [
+        "payload",
+        "offset",
+        "limit",
+        "total",
+        "page"
+      ],
+      "view": "import-http:views/import-feed/fields/http-url",
+      "required": true
+    },
+    "httpBody": {
+      "type": "code",
+      "engine": "Twig",
+      "variables": [
+        "payload",
+        "offset",
+        "limit",
+        "total",
+        "page"
+      ],
+      "useDisabledTextareaInViewMode": true
+    },
+    "httpOffset": {
+      "type": "int",
+      "notNull": true,
+      "default": 0
+    },
+    "httpLimit": {
+      "type": "int",
+      "notNull": true,
+      "default": 100
+    },
+    "httpTotal": {
+      "type": "int",
+      "default": null
+    }
+  },
+  "links": {
+    "connection": {
+      "type": "belongsTo",
+      "entity": "Connection"
+    }
+  }
+}
