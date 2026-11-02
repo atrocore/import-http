@@ -1,0 +1,11 @@
+{
+  "entity": true,
+  "type": "Subtype",
+  "supertypeId": "ImportFeed",
+  "module": "ImportHttp",
+  "layouts": false,
+  "customizable": false,
+  "importable": true,
+  "emHidden": true,
+  "enabledCopyConfigurations": true
+}

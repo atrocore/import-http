@@ -1,0 +1,222 @@
+[
+  {
+    "label": "Details",
+    "style": "default",
+    "rows": [
+      [
+        {
+          "name": "name"
+        },
+        {
+          "name": "isActive"
+        }
+      ],
+      [
+        {
+          "name": "entity"
+        },
+        {
+          "name": "code"
+        }
+      ],
+      [
+        {
+          "name": "type"
+        },
+        {
+          "name": "processingType"
+        }
+      ],
+      [
+        {
+          "name": "folder"
+        },
+        false
+      ],
+      [
+        {
+          "name": "fileDataAction"
+        },
+        false
+      ],
+      [
+        {
+          "name": "description",
+          "fullWidth": true
+        }
+      ],
+      [
+        {
+          "name": "lastStatus"
+        },
+        {
+          "name": "lastTime"
+        }
+      ],
+      [
+        {
+          "name": "executeAs"
+        },
+        {
+          "name": "maxPerJob"
+        }
+      ],
+      [
+        {
+          "name": "feedPayload",
+          "fullWidth": true
+        }
+      ]
+    ]
+  },
+  {
+    "label": "Data Sourcing",
+    "style": "default",
+    "rows": [
+      [
+        {
+          "name": "format"
+        },
+        {
+          "name": "file"
+        }
+      ],
+      [
+        {
+          "name": "rootNode"
+        },
+        false
+      ],
+      [
+        {
+          "name": "excludedNodes"
+        },
+        {
+          "name": "keptStringNodes"
+        }
+      ],
+      [
+        {
+          "name": "sheet"
+        },
+        false
+      ],
+      [
+        {
+          "name": "connection"
+        },
+        {
+          "name": "adapter"
+        }
+      ],
+      [
+        {
+          "name": "headerRowNumber"
+        },
+        {
+          "name": "dataStartRowNumber"
+        }
+      ],
+      [
+        {
+          "name": "fileFieldDelimiter"
+        },
+        {
+          "name": "fileTextQualifier"
+        }
+      ],
+      [
+        {
+          "name": "httpOffset"
+        },
+        {
+          "name": "httpLimit"
+        }
+      ],
+      [
+        {
+          "name": "httpMethod"
+        },
+        {
+          "name": "httpTotal"
+        }
+      ],
+      [
+        {
+          "name": "httpUrl",
+          "fullWidth": true
+        }
+      ],
+      [
+        {
+          "name": "httpBody",
+          "fullWidth": true
+        }
+      ],
+      [
+        {
+          "name": "mergeResponses"
+        },
+        false
+      ]
+    ]
+  },
+  {
+    "label": "Data Processing",
+    "style": "default",
+    "rows": [
+      [
+        {
+          "name": "sourceFields"
+        },
+        false
+      ],
+      [
+        {
+          "name": "delimiter"
+        },
+        {
+          "name": "fieldDelimiterForRelation"
+        }
+      ],
+      [
+        {
+          "name": "thousandSeparator"
+        },
+        {
+          "name": "decimalMark"
+        }
+      ],
+      [
+        {
+          "name": "emptyValue"
+        },
+        {
+          "name": "nullValue"
+        }
+      ],
+      [
+        {
+          "name": "markForNoRelation"
+        },
+        {
+          "name": "markForUnlinkedAttribute"
+        }
+      ],
+      [
+        {
+          "name": "skipValue"
+        },
+        {
+          "name": "skipMissingSourceFields"
+        }
+      ],
+      [
+        {
+          "name": "repeatProcessing"
+        },
+        false
+      ]
+    ]
+  }
+]

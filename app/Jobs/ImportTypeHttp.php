@@ -30,7 +30,7 @@ class ImportTypeHttp extends \Import\Jobs\ImportTypeSimple implements JobInterfa
             if (!empty($attachment)) {
                 $payload = new \stdClass();
                 if ($service->hasParentJob($importFeed)) {
-                    $parentJob = $service->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+                    $parentJob = $service->createImportJob($importFeed, $importFeed->get('entity'), $attachment->get('id'), $payload);
                     $payload->parentJobId = $parentJob->get('id');
                 }
 

@@ -59,12 +59,12 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
         $jobsData = $this->prepareJobsData($importFeed, $data);
 
-        if (!empty($importFeed->getFeedField('mergeResponses'))) {
+        if (!empty($importFeed->getSubtype()->get('mergeResponses'))) {
             if ($importFeed->get('processingType') === 'configurator') {
                 $this->createCombinedJob($importFeed, $jobsData);
                 return;
             } else {
-                $entityName = $importFeed->getFeedField('entity');
+                $entityName = $importFeed->get('entity');
                 $entityLabel = $this->getLanguage()->translate($entityName, 'scopeNames');
 
                 $parentJob = $this->getEntityManager()->getEntity('ImportJob');
@@ -111,11 +111,11 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $res = [];
 
         $payload = $data['payload'] ?? null;
-        $data['offset'] = $offset = (int)$importFeed->getFeedField('httpOffset');
-        $data['limit'] = $limit = (int)$importFeed->getFeedField('httpLimit');
-        $data['total'] = $total = $importFeed->getFeedField('httpTotal');
-        $httpUrl = trim((string)$importFeed->getFeedField('httpUrl'));
-        $httpBody = (string)$importFeed->getFeedField('httpBody');
+        $data['offset'] = $offset = (int)$importFeed->getSubtype()->get('httpOffset');
+        $data['limit'] = $limit = (int)$importFeed->getSubtype()->get('httpLimit');
+        $data['total'] = $total = $importFeed->getSubtype()->get('httpTotal');
+        $httpUrl = trim((string)$importFeed->getSubtype()->get('httpUrl'));
+        $httpBody = (string)$importFeed->getSubtype()->get('httpBody');
 
         preg_match_all('/\{\{(.*?)}}/m', $httpUrl, $httpUrlExtractedExp, PREG_SET_ORDER, 0);
         preg_match_all('/\{\{(.*?)}}/m', $httpBody, $httpBodyExtractedExp, PREG_SET_ORDER, 0);
@@ -247,7 +247,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $attachment = $this->getEntityManager()->getRepository('File')->get($attachmentId);
 
         if ($this->getImportFeedService()->hasParentJob($importFeed) && empty($payload->parentJobId)) {
-            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->get('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }
 
@@ -263,7 +263,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $attachment = $this->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
         if ($this->getImportFeedService()->hasParentJob($importFeed) && empty($payload->parentJobId)) {
-            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'), $payload);
+            $parentJob = $this->getImportFeedService()->createImportJob($importFeed, $importFeed->get('entity'), $attachment->get('id'), $payload);
             $payload->parentJobId = $parentJob->get('id');
         }
 
@@ -277,7 +277,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $jobData['payload'] = $payload;
         $jobData['data']['importJobId'] = $this
             ->getImportFeedService()
-            ->createImportJob($importFeed, $importFeed->getFeedField('entity'), $attachment->get('id'),
+            ->createImportJob($importFeed, $importFeed->get('entity'), $attachment->get('id'),
                 $payload)->get('id');
 
         if (!empty($this->importJobCreatorId)) {
@@ -295,9 +295,9 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     public function createAttachmentViaHttpRequest(Entity $importFeed, string $httpUrl, string $httpBody): File
     {
-        $httpMethod = $importFeed->getFeedField('httpMethod');
+        $httpMethod = $importFeed->getSubtype()->get('httpMethod');
         $httpHeaders = $importFeed->get('importHttpHeaders')->toArray();
-        $fileFormat = $importFeed->getFeedField('format');
+        $fileFormat = $importFeed->get('format');
 
         if (empty($fileFormat)) {
             throw new BadRequest('Validation failed. Format is required.');
@@ -333,7 +333,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $attachmentName = $this->createFileName($importFeed->get('name'), $ext);
 
         $response = $this
-            ->createConnection($importFeed->get('connectionId') ?? null)
+            ->createConnection($importFeed->getSubtype()->get('connectionId') ?? null)
             ->request($httpUrl, $httpMethod, $headers, $httpBody);
 
         $folder = $this->getImportFeedService()->createImportFileFolder($importFeed);
@@ -342,7 +342,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     protected function createCombinedJob(ImportFeed $importFeed, array $data): bool
     {
-        $format = $importFeed->getFeedField('format');
+        $format = $importFeed->get('format');
         if (!in_array($format, ['JSON', 'XML'])) {
             throw new Error('Combined job possible only with JSON or XML format.');
         }
@@ -514,13 +514,13 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     protected function importFeedFileHasData(ImportFeed $importFeed, File $file): bool
     {
-        $fileParser = $this->getFileParser($importFeed->getFeedField('format'));
+        $fileParser = $this->getFileParser($importFeed->get('format'));
         $fileParser->setData([
-            'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
-            'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
-            'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
-            'emptyValue'      => $importFeed->getFeedField('emptyValue'),
-            'nullValue'       => $importFeed->getFeedField('nullValue'),
+            'rootNode'        => $importFeed->getSubtype()->get('rootNode') ?? null,
+            'excludedNodes'   => $importFeed->getSubtype()->get('excludedNodes') ?? [],
+            'keptStringNodes' => $importFeed->getSubtype()->get('keptStringNodes') ?? [],
+            'emptyValue'      => $importFeed->getSubtype()->get('emptyValue'),
+            'nullValue'       => $importFeed->getSubtype()->get('nullValue'),
         ]);
 
         return $fileParser->hasFileData($file);
@@ -528,13 +528,13 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
 
     protected function parseImportFeedFile(ImportFeed $importFeed, File $file): array
     {
-        $fileParser = $this->getFileParser($importFeed->getFeedField('format'));
+        $fileParser = $this->getFileParser($importFeed->get('format'));
         $fileParser->setData([
-            'rootNode'        => $importFeed->getFeedField('rootNode') ?? null,
-            'excludedNodes'   => $importFeed->getFeedField('excludedNodes') ?? [],
-            'keptStringNodes' => $importFeed->getFeedField('keptStringNodes') ?? [],
-            'emptyValue'      => $importFeed->getFeedField('emptyValue'),
-            'nullValue'       => $importFeed->getFeedField('nullValue'),
+            'rootNode'        => $importFeed->getSubtype()->get('rootNode') ?? null,
+            'excludedNodes'   => $importFeed->getSubtype()->get('excludedNodes') ?? [],
+            'keptStringNodes' => $importFeed->getSubtype()->get('keptStringNodes') ?? [],
+            'emptyValue'      => $importFeed->getSubtype()->get('emptyValue'),
+            'nullValue'       => $importFeed->getSubtype()->get('nullValue'),
         ]);
 
         return $fileParser->getFileData($file);
