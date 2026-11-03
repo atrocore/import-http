@@ -382,6 +382,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $input->hidden = true;
         $input->folderId = $this->getImportFeedService()->createImportFileFolder($importFeed)->get('id');
 
+        $input->_generated = true;
         $fileId = $this->getService('File')->moveLocalFileToFileEntity($input, $tmpFile);
 
         // delete all tmp files
@@ -407,6 +408,7 @@ class ImportTypeHttpJobCreator extends AbstractJob implements JobInterface
         $input->hidden = true;
         $input->folderId = $folderId;
 
+        $input->_generated = true;
         $fileId = $this->getService('File')->createFileViaContents($input, $contents);
 
         return $this->getEntityManager()->getRepository('File')->get($fileId);
