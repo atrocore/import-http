@@ -28,5 +28,10 @@
   },
   "tooltips": {
     "mergeResponses": "Once downloaded, all responses are merged before starting processing. Processing is performed in a single Import Job."
+  },
+  "options": {
+    "type": {
+      "http": "HTTP Request"
+    }
   }
 }

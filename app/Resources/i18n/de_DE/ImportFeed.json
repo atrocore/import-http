@@ -29,5 +29,10 @@
   },
   "tooltips": {
     "mergeResponses": "Nach dem Herunterladen werden alle Antworten zusammengeführt, bevor die Verarbeitung beginnt. Die Verarbeitung erfolgt in einem einzigen Importauftrag."
+  },
+  "options": {
+    "type": {
+      "http": "HTTP-Anfrage"
+    }
   }
 }
