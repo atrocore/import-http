@@ -29,5 +29,10 @@
   },
   "tooltips": {
     "mergeResponses": "Une fois téléchargées, toutes les réponses sont fusionnées avant de commencer le traitement. Le traitement est effectué en une seule tâche d'importation."
+  },
+  "options": {
+    "type": {
+      "http": "Requête HTTP"
+    }
   }
 }

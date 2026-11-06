@@ -6,5 +6,8 @@
   "scopeNamesPlural": {
     "ImportHttpHeader": "Import Feed Headers",
     "ImportFeedTypeHttp": "Import Feed: HTTP Request"
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": "Imports data from API responses, requesting it page by page if needed."
   }
 }
