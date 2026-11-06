@@ -4,5 +4,8 @@
   },
   "scopeNamesPlural": {
     "ImportHttpHeader": "Import Feed Headers"
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": "Importiert Daten aus API-Antworten und fragt sie bei Bedarf seitenweise ab."
   }
 }
