@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Entities;
 
-class ImportHttpHeader extends \Espo\Core\Templates\Entities\Base
+class ImportHttpHeader extends \Atro\Core\Templates\Entities\Base
 {
     protected $entityType = "ImportHttpHeader";
 }
