@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ImportHttp\Listeners;
 
-use Espo\Core\EventManager\Event;
+use Atro\Core\EventManager\Event;
 
-class ImportFeedService extends \Espo\Listeners\AbstractListener
+class ImportFeedService extends \Atro\Listeners\AbstractListener
 {
 
 }

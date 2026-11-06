@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ImportHttp\Repositories;
 
-use Espo\Core\Templates\Repositories\Base;
+use Atro\Core\Templates\Repositories\Base;
 
 class ImportHttpHeader extends Base
 {
