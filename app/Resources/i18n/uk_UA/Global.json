@@ -1,11 +1,9 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Заголовок імпортного фіда",
-    "ImportFeedTypeHttp": ""
+    "ImportHttpHeader": "Заголовок імпортного фіда"
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Заголовки імпортного фіда",
-    "ImportFeedTypeHttp": ""
+    "ImportHttpHeader": "Заголовки імпортного фіда"
   },
   "subtypeDescriptions": {
     "ImportFeedTypeHttp": "Імпортує дані з відповідей API, за потреби запитуючи їх посторінково."
