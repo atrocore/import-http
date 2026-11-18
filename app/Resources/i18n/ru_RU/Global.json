@@ -1,8 +1,13 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Заголовок импортного фида"
+    "ImportHttpHeader": "Заголовок импортного фида",
+    "ImportFeedTypeHttp": "Импорт фида: HTTP-запрос"
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Заголовки импортного фида"
+    "ImportHttpHeader": "Заголовки импортного фида",
+    "ImportFeedTypeHttp": "Фид импорта: HTTP-запрос"
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": "Импортирует данные из ответов API, при необходимости запрашивая их постранично."
   }
 }
