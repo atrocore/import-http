@@ -23,7 +23,7 @@ class ImportHttp extends AbstractService
 {
     public function generateSourceFields(string $importFeedId): array
     {
-        if (!$this->getInjection('acl')->check('ImportFeed', 'edit')) {
+        if (!$this->container->get('acl')->check('ImportFeed', 'edit')) {
             throw new Forbidden();
         }
 
@@ -33,13 +33,13 @@ class ImportHttp extends AbstractService
             throw new NotFound();
         }
 
-        $httpUrl = $this->getInjection('twig')
+        $httpUrl = $this->container->get('twig')
             ->renderTemplate((string)$importFeed->getSubtype()->get('httpUrl'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
 
-        $httpBody = $this->getInjection('twig')
+        $httpBody = $this->container->get('twig')
             ->renderTemplate((string)$importFeed->getSubtype()->get('httpBody'), ['total' => 5, 'limit' => 5, 'offset' => 0]);
 
-        $attachment = $this->getInjection(ImportTypeHttpJobCreator::class)
+        $attachment = $this->container->get(ImportTypeHttpJobCreator::class)
             ->createAttachmentViaHttpRequest($importFeed, $httpUrl, $httpBody);
 
         $payload = new \stdClass();
@@ -63,7 +63,7 @@ class ImportHttp extends AbstractService
 
     public function generateURL(string $importFeedId): string
     {
-        if (!$this->getInjection('acl')->check('ImportFeed', 'edit')) {
+        if (!$this->container->get('acl')->check('ImportFeed', 'edit')) {
             throw new Forbidden();
         }
 
@@ -72,24 +72,14 @@ class ImportHttp extends AbstractService
             throw new NotFound();
         }
 
-        $connectionType = $this->getInjection(ImportTypeHttpJobCreator::class)
+        $connectionType = $this->container->get(ImportTypeHttpJobCreator::class)
             ->createConnection($importFeed->getSubtype()->get('connectionId'));
 
         return $connectionType->generateUrlForEntity($importFeed->get('entity'));
     }
 
-    protected function init()
-    {
-        parent::init();
-        $this->addDependency('twig');
-        $this->addDependency('acl');
-        $this->addDependency('serviceFactory');
-        $this->addDependency('container');
-        $this->addDependency(ImportTypeHttpJobCreator::class);
-    }
-
     protected function getImportFeedService(): ImportFeedService
     {
-        return $this->getInjection('serviceFactory')->create('ImportFeed');
+        return $this->container->get('serviceFactory')->create('ImportFeed');
     }
 }
