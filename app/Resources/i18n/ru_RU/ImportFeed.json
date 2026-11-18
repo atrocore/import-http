@@ -8,8 +8,7 @@
     "httpTotal": "Всего записей запросов",
     "httpConnectionName": "Имя соединения",
     "httpUrl": "URL",
-    "httpMethod": "Метод",
-    "httpConnectionId": "Соединение"
+    "httpMethod": "Метод"
   },
   "links": {
     "importHttpHeaders": "Заголовки"
@@ -29,5 +28,10 @@
   },
   "tooltips": {
     "mergeResponses": "После загрузки все ответы объединяются перед началом обработки. Обработка выполняется в рамках одного задания импорта."
+  },
+  "options": {
+    "type": {
+      "http": ""
+    }
   }
 }
