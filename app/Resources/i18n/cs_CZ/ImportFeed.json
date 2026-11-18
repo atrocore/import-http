@@ -6,7 +6,6 @@
     "httpTotal": "Záznamy o požadavcích celkem",
     "httpUrl": "URL",
     "httpMethod": "Metoda",
-    "httpConnectionId": "Připojení",
     "httpBody": "Tělo žádosti",
     "importHttpHeaders": "Záhlaví",
     "httpConnectionName": "Název připojení"
@@ -29,5 +28,10 @@
   },
   "tooltips": {
     "mergeResponses": "Po stažení se všechny odpovědi před zahájením zpracování sloučí. Zpracování se provádí v rámci jedné importní úlohy."
+  },
+  "options": {
+    "type": {
+      "http": "Požadavek HTTP"
+    }
   }
 }
