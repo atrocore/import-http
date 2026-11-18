@@ -31,7 +31,7 @@
   },
   "options": {
     "type": {
-      "http": ""
+      "http": "HTTP-запрос"
     }
   }
 }
