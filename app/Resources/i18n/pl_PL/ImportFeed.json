@@ -6,7 +6,6 @@
     "httpTotal": "Całkowita liczba rekordów żądań",
     "httpUrl": "URL AtroCore",
     "httpMethod": "Metoda",
-    "httpConnectionId": "Połączenie",
     "httpBody": "Treść wniosku",
     "importHttpHeaders": "Nagłówki",
     "httpConnectionName": "Nazwa połączenia"
@@ -29,5 +28,10 @@
   },
   "tooltips": {
     "mergeResponses": "Po pobraniu wszystkie odpowiedzi są łączone przed rozpoczęciem przetwarzania. Przetwarzanie odbywa się w ramach pojedynczego zadania importu."
+  },
+  "options": {
+    "type": {
+      "http": "Żądanie HTTP"
+    }
   }
 }
