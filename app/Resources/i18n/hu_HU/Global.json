@@ -1,1 +1,13 @@
-{}
+{
+  "scopeNames": {
+    "ImportHttpHeader": "Importálási adatfolyam fejléce",
+    "ImportFeedTypeHttp": "Importálási adatfolyam: HTTP-kérés"
+  },
+  "scopeNamesPlural": {
+    "ImportHttpHeader": "Importálási adatfolyam fejlécei",
+    "ImportFeedTypeHttp": "Import adatfolyam: HTTP-kérés"
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": "API-válaszokból importál adatokat, szükség esetén oldalanként lekérve azokat."
+  }
+}
