@@ -1,8 +1,13 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Importuj nagłówek kanału"
+    "ImportHttpHeader": "Importuj nagłówek kanału",
+    "ImportFeedTypeHttp": ""
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Importowanie nagłówków kanałów"
+    "ImportHttpHeader": "Importowanie nagłówków kanałów",
+    "ImportFeedTypeHttp": ""
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": ""
   }
 }
