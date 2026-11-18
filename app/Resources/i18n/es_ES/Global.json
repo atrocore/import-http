@@ -1,8 +1,13 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Importar el encabezado del feed"
+    "ImportHttpHeader": "Importar el encabezado del feed",
+    "ImportFeedTypeHttp": ""
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Importar cabeceras de alimentación"
+    "ImportHttpHeader": "Importar cabeceras de alimentación",
+    "ImportFeedTypeHttp": ""
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": ""
   }
 }
