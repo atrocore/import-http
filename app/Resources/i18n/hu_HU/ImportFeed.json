@@ -1,37 +1,37 @@
 {
   "fields": {
-    "mergeResponses": "",
-    "httpOffset": "",
-    "httpLimit": "",
-    "httpTotal": "",
-    "httpUrl": "",
-    "httpMethod": "",
-    "httpBody": "",
-    "importHttpHeaders": "",
-    "httpConnectionName": ""
+    "mergeResponses": "Válaszok egyesítése",
+    "httpOffset": "Kéréseltolás",
+    "httpLimit": "Kéréskorlát",
+    "httpTotal": "Összes kérési rekord",
+    "httpUrl": "URL",
+    "httpMethod": "Módszer",
+    "httpBody": "Kérés törzse",
+    "importHttpHeaders": "Fejlécek",
+    "httpConnectionName": "Kapcsolat neve"
   },
   "links": {
-    "importHttpHeaders": ""
+    "importHttpHeaders": "Fejlécek"
   },
   "labels": {
-    "http": "",
-    "execute": "",
-    "generateURL": "",
-    "generateSourceFields": ""
+    "http": "HTTP-kérés",
+    "execute": "Végrehajtás",
+    "generateURL": "URL generálása",
+    "generateSourceFields": "Forrásmezők generálása"
   },
   "messages": {
-    "confirmUrlGeneration": "",
-    "confirmSourceFieldsGeneration": ""
+    "confirmUrlGeneration": "Biztosan létrehozza az URL-t?",
+    "confirmSourceFieldsGeneration": "Biztosan létrehozza a forrásmezőket?"
   },
   "exceptions": {
-    "urlOrBodyCannotBeFormed": ""
+    "urlOrBodyCannotBeFormed": "Az URL vagy a kérés törzse nem állítható elő. Ellenőrizze az Eltolás, a Korlát és az Összes rekord paramétereket."
   },
   "tooltips": {
-    "mergeResponses": ""
+    "mergeResponses": "A letöltés után a feldolgozás megkezdése előtt a rendszer egyesíti az összes választ. A feldolgozás egyetlen importálási feladatban történik."
   },
   "options": {
     "type": {
-      "http": ""
+      "http": "HTTP-kérés"
     }
   }
 }
