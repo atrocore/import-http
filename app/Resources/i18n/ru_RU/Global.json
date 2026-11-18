@@ -1,8 +1,13 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Заголовок импортного фида"
+    "ImportHttpHeader": "Заголовок импортного фида",
+    "ImportFeedTypeHttp": ""
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Заголовки импортного фида"
+    "ImportHttpHeader": "Заголовки импортного фида",
+    "ImportFeedTypeHttp": ""
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": ""
   }
 }
