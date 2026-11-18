@@ -6,7 +6,6 @@
     "httpTotal": "Totale record di richiesta",
     "httpUrl": "URL",
     "httpMethod": "Metodo",
-    "httpConnectionId": "Connessione",
     "httpBody": "Corpo della richiesta",
     "importHttpHeaders": "Intestazioni",
     "httpConnectionName": "Nome della connessione"
@@ -29,5 +28,10 @@
   },
   "tooltips": {
     "mergeResponses": "Una volta scaricate, tutte le risposte vengono unite prima di iniziare l'elaborazione. L'elaborazione viene eseguita in un unico lavoro di importazione."
+  },
+  "options": {
+    "type": {
+      "http": "Richiesta HTTP"
+    }
   }
 }
