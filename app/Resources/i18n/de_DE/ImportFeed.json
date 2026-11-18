@@ -8,8 +8,7 @@
     "httpBody": "Anfrage Körper",
     "httpTotal": "Total Anfrage Datensätze",
     "httpUrl": "URL",
-    "httpMethod": "Methode",
-    "httpConnectionId": "Verbindung"
+    "httpMethod": "Methode"
   },
   "links": {
     "importHttpHeaders": "Headers"
