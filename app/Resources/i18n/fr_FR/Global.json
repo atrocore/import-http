@@ -1,9 +1,11 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Entête du flux d'import"
+    "ImportHttpHeader": "Entête du flux d'import",
+    "ImportFeedTypeHttp": ""
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Entêtes du flux d'import"
+    "ImportHttpHeader": "Entêtes du flux d'import",
+    "ImportFeedTypeHttp": ""
   },
   "subtypeDescriptions": {
     "ImportFeedTypeHttp": "Importe des données à partir des réponses d'une API, en les demandant page par page si nécessaire."
