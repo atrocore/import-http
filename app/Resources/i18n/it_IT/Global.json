@@ -1,13 +1,13 @@
 {
   "scopeNames": {
     "ImportHttpHeader": "Importazione dell'intestazione del mangime",
-    "ImportFeedTypeHttp": ""
+    "ImportFeedTypeHttp": "Feed di importazione: richiesta HTTP"
   },
   "scopeNamesPlural": {
     "ImportHttpHeader": "Importazione delle intestazioni dei mangimi",
-    "ImportFeedTypeHttp": ""
+    "ImportFeedTypeHttp": "Feed di importazione: richiesta HTTP"
   },
   "subtypeDescriptions": {
-    "ImportFeedTypeHttp": ""
+    "ImportFeedTypeHttp": "Importa i dati dalle risposte API, richiedendoli pagina per pagina se necessario."
   }
 }
