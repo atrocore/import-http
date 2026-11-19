@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ImportHttp\Handlers\ImportFeed;
+namespace ImportHttp\Handlers\ImportFeedTypeHttp;
 
 use Atro\Core\Http\Response\JsonResponse;
 use Atro\Core\Routing\Route;
@@ -21,13 +21,13 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 #[Route(
-    path: '/ImportFeed/{id}/detectSourceFields',
+    path: '/ImportFeedTypeHttp/{id}/generateURL',
     methods: [
         'POST',
     ],
-    summary: 'Detect source fields',
-    description: 'Fetches a sample response from the configured HTTP source and returns the detected source fields for use in import feed column mapping.',
-    tag: 'ImportFeed',
+    summary: 'Generate connection URL',
+    description: 'Builds and returns the resolved endpoint URL for the connection attached to the specified import feed.',
+    tag: 'ImportFeedTypeHttp',
     parameters: [
         [
             'name'        => 'id',
@@ -41,23 +41,14 @@ use Psr\Http\Server\RequestHandlerInterface;
     ],
     responses: [
         200 => [
-            'description' => 'Detected source fields and the temporary file created from the HTTP response',
+            'description' => 'Resolved connection URL',
             'content'     => [
                 'application/json' => [
                     'schema' => [
                         'type'       => 'object',
                         'properties' => [
-                            'fileId'       => [
+                            'url' => [
                                 'type' => 'string',
-                            ],
-                            'fileName'     => [
-                                'type' => 'string',
-                            ],
-                            'sourceFields' => [
-                                'type'  => 'array',
-                                'items' => [
-                                    'type' => 'string',
-                                ],
                             ],
                         ],
                     ],
@@ -75,12 +66,14 @@ use Psr\Http\Server\RequestHandlerInterface;
         'ImportFeed',
     ],
 )]
-class DetectSourceFieldsHandler extends AbstractHandler
+class GenerateURLHandler extends AbstractHandler
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $id = $request->getAttribute('id');
 
-        return new JsonResponse($this->getRecordService('ImportHttp')->generateSourceFields($id));
+        $url = $this->getRecordService('ImportHttp')->generateURL($id);
+
+        return new JsonResponse(['url' => $url]);
     }
 }
