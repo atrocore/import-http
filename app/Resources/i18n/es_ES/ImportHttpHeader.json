@@ -2,9 +2,9 @@
   "fields": {
     "name": "Clave",
     "value": "Valor",
-    "importFeed": "Importación"
+    "importFeed": "Importar alimentación"
   },
   "links": {
-    "importFeed": "Importación"
+    "importFeed": "Importar alimentación"
   }
 }

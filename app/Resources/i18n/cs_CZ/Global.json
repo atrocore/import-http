@@ -1,8 +1,13 @@
 {
   "scopeNames": {
-    "ImportHttpHeader": "Importovat hlavičku krmiva"
+    "ImportHttpHeader": "Importovat hlavičku krmiva",
+    "ImportFeedTypeHttp": "Importní kanál: požadavek HTTP"
   },
   "scopeNamesPlural": {
-    "ImportHttpHeader": "Import záhlaví krmiva"
+    "ImportHttpHeader": "Import záhlaví krmiva",
+    "ImportFeedTypeHttp": "Importní feed: požadavek HTTP"
+  },
+  "subtypeDescriptions": {
+    "ImportFeedTypeHttp": "Importuje data z odpovědí API a v případě potřeby je vyžádá po jednotlivých stránkách."
   }
 }

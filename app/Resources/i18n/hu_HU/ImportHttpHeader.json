@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "name": "Kulcs",
+    "value": "Érték",
+    "importFeed": "Importálási adatfolyam"
+  },
+  "links": {
+    "importFeed": "Importadatfolyam"
+  }
+}

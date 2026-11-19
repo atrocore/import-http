@@ -6,7 +6,6 @@
     "httpTotal": "Total des enregistrements de la requête",
     "httpUrl": "URL",
     "httpMethod": "Méthode",
-    "httpConnectionId": "Connexion",
     "httpBody": "Corps de la requête",
     "importHttpHeaders": "En-têtes",
     "httpConnectionName": "Nom de la connexion"
