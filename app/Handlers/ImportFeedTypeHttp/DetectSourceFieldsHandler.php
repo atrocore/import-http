@@ -28,6 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
     summary: 'Detect source fields',
     description: 'Fetches a sample response from the configured HTTP source and returns the detected source fields for use in import feed column mapping.',
     tag: 'ImportFeedTypeHttp',
+    operationId: 'detectHttpImportSourceFields',
     parameters: [
         [
             'name'        => 'id',

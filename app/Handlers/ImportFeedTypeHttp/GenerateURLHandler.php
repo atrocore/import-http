@@ -28,6 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
     summary: 'Generate connection URL',
     description: 'Builds and returns the resolved endpoint URL for the connection attached to the specified import feed.',
     tag: 'ImportFeedTypeHttp',
+    operationId: 'generateHttpImportUrl',
     parameters: [
         [
             'name'        => 'id',
